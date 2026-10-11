@@ -1,6 +1,6 @@
 // Service worker: guarda o app no aparelho para funcionar sem internet.
 // Ao alterar qualquer arquivo do app, aumente a versão abaixo.
-const VERSAO = 'm3e-relatorio-v6';
+const VERSAO = 'm3e-relatorio-v8';
 const ARQUIVOS = [
   './',
   './index.html',

@@ -185,6 +185,12 @@ button { font: inherit; cursor: pointer; }
 </header>
 
 <main>
+  <section class="card" id="perm-card" aria-labelledby="h-perm" hidden>
+    <h2 id="h-perm">Permissões do aparelho</h2>
+    <p class="hint" style="margin:0">Para o app funcionar por completo, libere a localização (GPS), a câmera e o armazenamento neste aparelho.</p>
+    <div id="perm-st" class="resumo" role="status" aria-live="polite"></div>
+    <button id="btn-perm" class="btn primary" type="button">Liberar permissões</button>
+  </section>
   <section class="card" aria-labelledby="h-id">
     <h2 id="h-id">Identificação</h2>
     <div class="fld">
@@ -1200,6 +1206,66 @@ button { font: inherit; cursor: pointer; }
   $('env-down').addEventListener('click', function () { enviar('baixar'); });
   $('env-share2').addEventListener('click', function () { if (preparados) { var r = preparados; $('env-pronto').hidden = true; compartilhar(r); } });
 
+  /* ---------- Permissões (localização e armazenamento) ---------- */
+  var permFeito = false;
+  function navegadorInterno() { return /FBAN|FBAV|Instagram|Line\/|; wv\)|WhatsApp|Telegram|Messenger/i.test(navigator.userAgent); }
+  function estadoPerm(nome) {
+    return new Promise(function (ok) {
+      try {
+        if (!navigator.permissions || !navigator.permissions.query) return ok('desconhecido');
+        navigator.permissions.query({ name: nome }).then(function (r) { r.onchange = atualizarPerm; ok(r.state); }, function () { ok('desconhecido'); });
+      } catch (e) { ok('desconhecido'); }
+    });
+  }
+  function estadoLoc() {
+    return Promise.all([estadoPerm('geolocation'), estadoPerm('camera')]).then(function (v) {
+      var g = v[0], c = v[1];
+      if (g === 'denied' || c === 'denied') return { st: 'denied', loc: g, cam: c };
+      if (g === 'granted' && (c === 'granted' || c === 'desconhecido')) return { st: 'granted', loc: g, cam: c };
+      return { st: (g === 'desconhecido' && c === 'desconhecido') ? 'desconhecido' : 'prompt', loc: g, cam: c };
+    });
+  }
+  function atualizarPerm(extra) {
+    estadoLoc().then(function (r) {
+      var st = r.st, card = $('perm-card'), box = $('perm-st'), linhas = [];
+      card.hidden = (st === 'granted') || (st === 'desconhecido' && permFeito);
+      if (card.hidden) return;
+      if (!window.isSecureContext) linhas.push('Este endereço não é seguro (HTTPS). O GPS e o modo offline não funcionam. Abra o link oficial do app.');
+      if (navegadorInterno()) linhas.push('Você abriu o link dentro de outro aplicativo (como o WhatsApp). Esses navegadores bloqueiam o GPS. Toque nos três pontinhos e escolha "Abrir no Chrome" (ou Safari no iPhone).');
+      if (st === 'denied') linhas.push((r.loc === 'denied' ? 'Localização' : 'Câmera') + ': bloqueada. Toque no cadeado ao lado do endereço > Permissões e permita Localização e Câmera. No app instalado: Configurações do aparelho > Apps > Relatório M3E > Permissões. Depois toque em Verificar novamente.');
+      else if (st === 'prompt') linhas.push('Localização e câmera: ainda não liberadas. Toque em Liberar permissões e escolha "Permitir" nas duas perguntas.');
+      else linhas.push('Toque em Liberar permissões para ativar localização e câmera.');
+      if (extra) linhas.push(extra);
+      box.textContent = linhas.join('\n'); box.style.whiteSpace = 'pre-line';
+      $('btn-perm').textContent = st === 'denied' ? 'Verificar novamente' : 'Liberar permissões';
+    });
+  }
+  $('btn-perm').addEventListener('click', function () {
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+    if (!('geolocation' in navigator)) { aviso('Este aparelho não oferece localização.'); return; }
+    function camera() {
+      return new Promise(function (ok) {
+        try {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return ok(true);
+          navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }).then(function (str) {
+            str.getTracks().forEach(function (t) { t.stop(); }); ok(true);
+          }, function () { ok(false); });
+        } catch (e) { ok(true); }
+      });
+    }
+    function fim(msgLoc) {
+      camera().then(function (camOk) {
+        permFeito = true; dbSet('permOk', true);
+        var extra = msgLoc || (camOk ? '' : 'Câmera não liberada. Siga as instruções acima.');
+        atualizarPerm(extra);
+        if (!extra) aviso('Permissões liberadas. O app está pronto para uso.', 5000);
+      });
+    }
+    navigator.geolocation.getCurrentPosition(function () { fim(''); }, function (e) {
+      fim(e.code === 1 ? 'Localização negada. Siga as instruções acima.' : 'Não foi possível obter a posição agora. Vá para um local aberto e tente de novo.');
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 });
+  });
+
   /* ---------- Rede, instalação e service worker ---------- */
   function rede() {
     var n = $('net'), on = navigator.onLine;
@@ -1217,9 +1283,9 @@ button { font: inherit; cursor: pointer; }
   }
 
   /* ---------- Início ---------- */
-  abrirDB().then(function () { return Promise.all([dbGet('rascunho'), dbGet('listas'), dbGet('indice')]); }).then(function (res) {
+  abrirDB().then(function () { return Promise.all([dbGet('rascunho'), dbGet('listas'), dbGet('indice'), dbGet('permOk')]); }).then(function (res) {
     var r = res[0], l = res[1];
-    indice = Array.isArray(res[2]) ? res[2] : [];
+    indice = Array.isArray(res[2]) ? res[2] : []; permFeito = !!res[3]; atualizarPerm();
     try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
     if (l && l.listas) {
       listas = copiarListas(l.listas); metaListas = l.meta || null;

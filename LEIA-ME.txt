@@ -1,4 +1,4 @@
-RELATÓRIO DE CAMPO M3E - app de coleta de dados de topografia (PWA)  -  versão 6
+RELATÓRIO DE CAMPO M3E - app de coleta de dados de topografia (PWA)  -  versão 8
 
 O QUE FAZ
 - Cada relatório tem: projeto, colaborador, tipo de levantamento, data, nome do vértice
@@ -56,8 +56,18 @@ GERAR O APK (um arquivo para enviar pelo WhatsApp)
 O APK abre o endereço publicado, então as próximas atualizações do app chegam
 pelo GitHub Pages, sem gerar APK de novo.
 
+PERMISSÕES
+- Navegadores não permitem pedir permissão no momento da instalação. Por isso o app
+  mostra o cartão "Permissões do aparelho" no topo, até a localização ser liberada.
+  Toque em "Liberar permissões" e escolha "Permitir" nas duas perguntas (GPS e câmera).
+- Abra o link no Chrome (Android) ou Safari (iPhone), nunca dentro do WhatsApp ou de
+  outro aplicativo: esses navegadores internos bloqueiam o GPS.
+- Se bloquear sem querer: cadeado ao lado do endereço > Permissões > Localização > Permitir.
+- No APK do PWABuilder, em Android options deixe ligada a opção "Location delegation"
+  (delegação de localização) antes de gerar o pacote.
+
 ATENÇÃO
 - Os relatórios ficam apenas no aparelho. Limpar os dados do navegador/app apaga tudo:
   envie os PDFs antes de limpar.
 - Ao alterar qualquer arquivo do app, aumente a versão em sw.js
-  (const VERSAO = 'm3e-relatorio-v7') para os celulares receberem a atualização.
+  (const VERSAO = 'm3e-relatorio-v9') para os celulares receberem a atualização.
