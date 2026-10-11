@@ -1,39 +1,59 @@
-RELATÓRIO DE CAMPO M3E - app de coleta de dados de topografia (PWA)
+RELATÓRIO DE CAMPO M3E - app de coleta de dados de topografia (PWA)  -  versão 3
 
 O QUE FAZ
-- Formulário: colaborador, tipo de levantamento, data, coordenadas (GPS do aparelho),
-  equipamento, altura da antena (cm), tipo de altura (vertical/inclinada),
-  observações e fotos (mínimo 2).
+- Cada relatório tem: projeto, colaborador, tipo de levantamento, data, coordenadas
+  (GPS do aparelho), equipamento, altura da antena (cm), tipo de altura
+  (vertical/inclinada), observações e fotos (mínimo 2).
+- Projeto, colaborador, tipo de levantamento e equipamento são listas suspensas,
+  com a opção "+ Adicionar novo item..." no fim de cada uma.
 - Funciona sem internet depois da primeira abertura.
-- Gera PDF de uma página (fotos extras vão para a página seguinte) e compartilha
-  pelo WhatsApp, e-mail ou qualquer app do aparelho.
-- O rascunho fica salvo no aparelho até você tocar em "Novo relatório".
+- Relatório salvo fica guardado no aparelho. No fim do dia, o botão Enviar
+  permite escolher quais relatórios mandar (todos ou só alguns) e gerar
+  um PDF por relatório ou um único PDF com todos.
+
+FLUXO NO CAMPO
+1. Preencha o relatório e toque em "Salvar relatório".
+2. O botão "Novo relatório" só libera depois de salvar. O novo já vem com projeto,
+   colaborador, tipo de levantamento e equipamento do anterior; o restante fica em branco.
+3. Se mexer em um relatório já salvo, toque em "Salvar alterações" antes de iniciar outro.
+4. Botão Enviar: o relatório atual vem marcado e aparece primeiro. Use
+   "Selecionar todos" ou marque um a um. Em "Compartilhar" abre o WhatsApp/e-mail
+   com os PDFs anexados; "Baixar" salva em Downloads.
+5. Em Enviar também dá para Editar ou Excluir um relatório salvo.
+
+LISTAS (botão "Listas" no topo)
+- Importar planilha (.xlsx ou .csv) com cabeçalhos: Projeto, Colaborador,
+  Tipo de Levantamento, Equipamento. Uma coluna por lista.
+  "Substituir" troca a lista pelo conteúdo da planilha; "Somar" acrescenta sem repetir.
+  Colunas ausentes mantêm a lista atual.
+- Exportar: baixa as listas atuais (com os itens adicionados no aparelho) no mesmo
+  formato, para atualizar a planilha mestre.
+- As listas ficam em cada aparelho. Para padronizar a equipe, distribua a planilha
+  mestre e peça para importar.
 
 ARQUIVOS (manter todos juntos na mesma pasta)
-  index.html, jspdf.umd.min.js, manifest.webmanifest, sw.js,
+  index.html, jspdf.umd.min.js, xlsx.mini.min.js, manifest.webmanifest, sw.js,
   icon-192.png, icon-512.png, icon-maskable-512.png
 
 IMPORTANTE: GPS, modo offline e instalação só funcionam com HTTPS.
 Abrir o index.html direto do celular (file://) não serve.
 
-CAMINHO 1 - Hospedar e instalar pelo Chrome (mais rápido)
-1. Suba a pasta em um endereço HTTPS. Opção gratuita: GitHub Pages
-   (novo repositório > enviar os arquivos > Settings > Pages > branch main).
-   Também serve o servidor da M3E, desde que com HTTPS.
-2. No Android, abra o endereço no Chrome.
-3. Menu (três pontinhos) > "Instalar app" / "Adicionar à tela inicial".
-4. Abra uma vez com internet e permita a localização. Depois disso funciona offline.
+PUBLICAR / ATUALIZAR NO GITHUB PAGES
+1. No repositório, clique em Add file > Upload files e envie TODOS os arquivos
+   desta pasta, inclusive o novo xlsx.mini.min.js. Confirme com Commit changes.
+2. Aguarde 1 a 2 minutos. Nos celulares, abra o app com internet; ele baixa a
+   versão nova (se ainda aparecer a antiga, feche e abra de novo).
+3. Os relatórios e as listas já salvos no aparelho são mantidos na atualização.
 
-CAMINHO 2 - Gerar o APK (um arquivo para enviar pelo WhatsApp)
-1. Faça o passo 1 do caminho acima (precisa do endereço HTTPS).
-2. Acesse pwabuilder.com, cole o endereço e clique em Start.
-3. Escolha Package for stores > Android e gere o pacote.
-4. Do ZIP baixado, use o arquivo .apk (o .aab é só para a Play Store).
-5. Envie o .apk à equipe. No celular, o Android pede para permitir instalação
-   de fontes desconhecidas.
-Observação: para publicar na Play Store é preciso guardar o arquivo de chave
-(signing key) que o PWABuilder entrega junto.
+GERAR O APK (um arquivo para enviar pelo WhatsApp)
+1. Com o app publicado em HTTPS, acesse pwabuilder.com, cole o endereço e clique em Start.
+2. Package for stores > Android, gere o pacote e use o arquivo .apk do ZIP baixado.
+3. Envie o .apk à equipe e peça para permitir instalação de fontes desconhecidas.
+O APK abre o endereço publicado, então as próximas atualizações do app chegam
+pelo GitHub Pages, sem gerar APK de novo.
 
-ATUALIZAR O APP
-Altere os arquivos, aumente a versão em sw.js (const VERSAO = 'm3e-relatorio-v2')
-e publique de novo. Os aparelhos recebem a nova versão ao abrir com internet.
+ATENÇÃO
+- Os relatórios ficam apenas no aparelho. Limpar os dados do navegador/app apaga tudo:
+  envie os PDFs antes de limpar.
+- Ao alterar qualquer arquivo do app, aumente a versão em sw.js
+  (const VERSAO = 'm3e-relatorio-v4') para os celulares receberem a atualização.

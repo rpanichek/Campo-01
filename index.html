@@ -41,6 +41,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
   background: var(--bg); color: var(--ink);
@@ -65,8 +66,26 @@ header.top .grow { flex: 1; min-width: 0; }
 }
 .chip::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #5FD392; margin-right: 6px; }
 .chip.off::before { background: #FFB74D; }
-#btn-install { font-size: .75rem; font-weight: 600; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.5); background: transparent; color: #fff; }
+.hbtn, #btn-install { font-size: .75rem; font-weight: 600; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.5); background: transparent; color: #fff; }
 
+.addrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.addrow input { flex: 1 1 100%; }
+.addrow .btn { flex: 1; }
+.btn.sm { min-height: 44px; padding: 0 14px; }
+.panel { position: fixed; inset: 0; z-index: 20; background: var(--bg); overflow-y: auto; padding-inline: 16px; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+.panel .ph { position: sticky; top: 0; z-index: 1; background: var(--navy); color: #fff; margin-inline: -16px; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px; }
+.panel .ph .in { max-width: 640px; margin-inline: auto; display: flex; align-items: center; gap: 12px; }
+.panel .ph h2 { margin: 0; font-size: 1.1rem; flex: 1; }
+.panel .pb { max-width: 640px; margin-inline: auto; padding-block: 16px; display: grid; gap: 14px; }
+.panel h3 { margin: 0; font-size: .95rem; }
+.panel p { margin: 0; font-size: .85rem; color: var(--muted); }
+.opt { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: .9rem; }
+.opt input { width: 20px; height: 20px; accent-color: var(--teal); }
+.resumo { font-size: .85rem; background: var(--field); border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 4px; }
+.resumo.bad { border-color: var(--danger); color: var(--danger); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip2 { display: inline-flex; align-items: center; gap: 2px; background: var(--field); border: 1px solid var(--line); border-radius: 99px; padding: 2px 2px 2px 12px; font-size: .85rem; }
+.chip2 button { border: 0; background: transparent; color: var(--muted); width: 30px; height: 30px; border-radius: 50%; font-size: 1.05rem; line-height: 1; }
 main { max-width: 640px; margin-inline: auto; padding-block: 16px; display: grid; gap: 14px; }
 section.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 14px; }
 section.card > h2 { margin: 0; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -125,10 +144,24 @@ button { font: inherit; cursor: pointer; }
 }
 .bar .in { max-width: 640px; margin-inline: auto; display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
 .toast {
-  position: fixed; left: 16px; right: 16px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); z-index: 7;
+  position: fixed; left: 16px; right: 16px; top: calc(78px + env(safe-area-inset-top, 0px)); z-index: 30;
   max-width: 608px; margin-inline: auto; background: var(--navy); color: #fff; border-radius: 10px;
   padding: 12px 14px; font-size: .88rem; box-shadow: 0 6px 24px rgba(0,0,0,.25);
 }
+.selbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.selbar .count { flex: 1 1 100%; }
+.selbar .btn { flex: 1; }
+.rels { display: grid; gap: 8px; }
+.relrow { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; background: var(--field); padding: 8px 8px 8px 12px; }
+.rel { display: flex; gap: 12px; align-items: center; min-width: 0; min-height: 48px; }
+.rel input { width: 22px; height: 22px; accent-color: var(--teal); flex: none; }
+.rt { display: grid; gap: 2px; min-width: 0; }
+.rt b { font-size: .92rem; overflow-wrap: anywhere; }
+.rt small { color: var(--muted); font-size: .78rem; overflow-wrap: anywhere; }
+.tag { font-style: normal; font-size: .72rem; font-weight: 700; color: var(--teal); }
+.relact { display: grid; gap: 6px; }
+.relact .btn { min-height: 36px; padding: 0 10px; font-size: .78rem; }
+.env-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .foot { text-align: center; color: var(--muted); font-size: .75rem; padding: 4px 0 8px; display: grid; gap: 8px; justify-items: center; }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: up .18s ease-out; } @keyframes up { from { transform: translateY(8px); opacity: 0; } } }
 </style>
@@ -142,6 +175,7 @@ button { font: inherit; cursor: pointer; }
       <p>M3E · Topografia</p>
     </div>
     <button id="btn-install" type="button" hidden>Instalar</button>
+    <button id="btn-menu" class="hbtn" type="button" aria-haspopup="dialog">Listas</button>
     <span id="net" class="chip">Online</span>
   </div>
 </header>
@@ -149,24 +183,34 @@ button { font: inherit; cursor: pointer; }
 <main>
   <section class="card" aria-labelledby="h-id">
     <h2 id="h-id">Identificação</h2>
-    <div>
+    <div class="fld">
+      <label class="lbl" for="f-proj">Projeto</label>
+      <select id="f-proj"></select>
+      <div class="addrow" id="add-projetos" hidden>
+        <input type="text" id="n-projetos" placeholder="Digite o novo item" autocomplete="off" aria-label="Novo item de Projeto">
+        <button type="button" class="btn primary sm" data-add="projetos">Adicionar</button>
+        <button type="button" class="btn sm" data-cancel="projetos">Cancelar</button>
+      </div>
+      <div class="msg" data-for="f-proj"></div>
+    </div>
+    <div class="fld">
       <label class="lbl" for="f-nome">Nome do colaborador</label>
-      <input id="f-nome" type="text" autocomplete="name" autocapitalize="words" placeholder="Nome e sobrenome">
+      <select id="f-nome"></select>
+      <div class="addrow" id="add-colaboradores" hidden>
+        <input type="text" id="n-colaboradores" placeholder="Digite o novo item" autocomplete="off" aria-label="Novo item de Nome do colaborador">
+        <button type="button" class="btn primary sm" data-add="colaboradores">Adicionar</button>
+        <button type="button" class="btn sm" data-cancel="colaboradores">Cancelar</button>
+      </div>
       <div class="msg" data-for="f-nome"></div>
     </div>
-    <div>
+    <div class="fld">
       <label class="lbl" for="f-tipo">Tipo de levantamento</label>
-      <select id="f-tipo">
-        <option value="">Selecione…</option>
-        <option>Topografia convencional (estação total)</option>
-        <option>GNSS RTK</option>
-        <option>GNSS estático</option>
-        <option>Nivelamento geométrico</option>
-        <option>Mobile Laser Scanning (MLS)</option>
-        <option>Drone / LiDAR (apoio de campo)</option>
-        <option>Cadastro de faixa de domínio</option>
-        <option>Outro (descrever nas observações)</option>
-      </select>
+      <select id="f-tipo"></select>
+      <div class="addrow" id="add-tipos" hidden>
+        <input type="text" id="n-tipos" placeholder="Digite o novo item" autocomplete="off" aria-label="Novo item de Tipo de levantamento">
+        <button type="button" class="btn primary sm" data-add="tipos">Adicionar</button>
+        <button type="button" class="btn sm" data-cancel="tipos">Cancelar</button>
+      </div>
       <div class="msg" data-for="f-tipo"></div>
     </div>
     <div>
@@ -198,10 +242,14 @@ button { font: inherit; cursor: pointer; }
 
   <section class="card" aria-labelledby="h-eq">
     <h2 id="h-eq">Equipamento e antena</h2>
-    <div>
+    <div class="fld">
       <label class="lbl" for="f-equip">Equipamento</label>
-      <input id="f-equip" type="text" list="dl-equip" autocomplete="off" placeholder="Modelo / número de série">
-      <datalist id="dl-equip"></datalist>
+      <select id="f-equip"></select>
+      <div class="addrow" id="add-equipamentos" hidden>
+        <input type="text" id="n-equipamentos" placeholder="Digite o novo item" autocomplete="off" aria-label="Novo item de Equipamento">
+        <button type="button" class="btn primary sm" data-add="equipamentos">Adicionar</button>
+        <button type="button" class="btn sm" data-cancel="equipamentos">Cancelar</button>
+      </div>
       <div class="msg" data-for="f-equip"></div>
     </div>
     <div>
@@ -240,21 +288,93 @@ button { font: inherit; cursor: pointer; }
     <div class="msg" data-for="fotos"></div>
   </section>
 
-  <div class="foot">
-    <span id="saved">Rascunho salvo neste aparelho.</span>
-    <button id="btn-new" class="btn danger" type="button">Novo relatório</button>
-  </div>
+  <section class="card" aria-labelledby="h-fim">
+    <h2 id="h-fim">Salvar e seguir</h2>
+    <div id="status-rel" class="resumo" role="status" aria-live="polite"></div>
+    <div class="row">
+      <button class="btn primary" type="button" data-acao="salvar">Salvar relatório</button>
+      <button id="btn-new" class="btn" type="button" disabled>Novo relatório</button>
+    </div>
+    <p class="hint">O botão Novo relatório libera depois de salvar. O novo já vem com projeto, colaborador, tipo de levantamento e equipamento do anterior; o restante fica em branco.</p>
+    <button id="btn-clear" class="btn danger" type="button">Limpar dados deste ponto</button>
+  </section>
+
+  <div class="foot"><span id="saved">Rascunho salvo automaticamente neste aparelho.</span></div>
 </main>
 
 <div class="bar">
   <div class="in">
-    <button id="btn-share" class="btn primary" type="button">Compartilhar PDF</button>
-    <button id="btn-pdf" class="btn" type="button">Baixar</button>
+    <button class="btn primary" type="button" data-acao="salvar">Salvar relatório</button>
+    <button id="btn-send" class="btn" type="button">Enviar</button>
+  </div>
+</div>
+<div id="panel" class="panel" role="dialog" aria-modal="true" aria-labelledby="h-panel" hidden>
+  <div class="ph"><div class="in">
+    <h2 id="h-panel">Listas de opções</h2>
+    <button id="btn-panel-close" class="hbtn" type="button">Fechar</button>
+  </div></div>
+  <div class="pb">
+    <section class="card" aria-labelledby="h-imp">
+      <h2 id="h-imp">Importar planilha</h2>
+      <p>Use uma planilha (.xlsx ou .csv) com uma coluna para cada lista. Cabeçalhos aceitos: Projeto, Colaborador, Tipo de Levantamento e Equipamento. Colunas ausentes mantêm a lista atual.</p>
+      <div role="radiogroup" aria-label="Modo de importação">
+        <label class="opt"><input type="radio" name="modo-imp" value="substituir" checked> Substituir as listas pelo conteúdo da planilha</label>
+        <label class="opt"><input type="radio" name="modo-imp" value="somar"> Somar à lista atual, sem repetir</label>
+      </div>
+      <button id="btn-imp" class="btn primary" type="button">Escolher planilha</button>
+      <input id="in-xlsx" type="file" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden>
+      <div id="resumo" class="resumo" hidden></div>
+      <button id="btn-aplicar" class="btn primary" type="button" hidden>Aplicar listas</button>
+      <div id="meta-imp" class="hint"></div>
+    </section>
+    <section class="card" aria-labelledby="h-exp">
+      <h2 id="h-exp">Exportar</h2>
+      <p>Baixa as listas atuais, com os itens adicionados no aparelho, no mesmo formato da importação. Envie ao responsável para atualizar a planilha mestre.</p>
+      <button id="btn-exp" class="btn" type="button">Baixar listas (.xlsx)</button>
+    </section>
+    <section class="card" aria-labelledby="h-atu">
+      <h2 id="h-atu">Listas atuais</h2>
+      <div id="listas-atuais" style="display:grid;gap:16px"></div>
+    </section>
+  </div>
+</div>
+<div id="panel-env" class="panel" role="dialog" aria-modal="true" aria-labelledby="h-env" hidden>
+  <div class="ph"><div class="in">
+    <h2 id="h-env">Enviar relatórios</h2>
+    <button id="btn-env-close" class="hbtn" type="button">Fechar</button>
+  </div></div>
+  <div class="pb">
+    <section class="card" aria-labelledby="h-env-l">
+      <h2 id="h-env-l">Escolha os relatórios</h2>
+      <div class="selbar">
+        <span id="env-count" class="count" role="status" aria-live="polite"></span>
+        <button id="env-todos" class="btn sm" type="button">Selecionar todos</button>
+        <button id="env-nenhum" class="btn sm" type="button">Limpar seleção</button>
+      </div>
+      <div id="env-lista" class="rels"></div>
+      <p id="env-vazio" hidden>Nenhum relatório para enviar. Preencha um relatório e toque em Salvar.</p>
+    </section>
+    <section class="card" aria-labelledby="h-env-f">
+      <h2 id="h-env-f">Formato do envio</h2>
+      <div role="radiogroup" aria-label="Formato do envio">
+        <label class="opt"><input type="radio" name="fmt-env" value="separados" checked> Um PDF por relatório</label>
+        <label class="opt"><input type="radio" name="fmt-env" value="unico"> Um único PDF com todos</label>
+      </div>
+      <div class="env-actions">
+        <button id="env-share" class="btn primary" type="button">Compartilhar</button>
+        <button id="env-down" class="btn" type="button">Baixar</button>
+      </div>
+      <div id="env-pronto" hidden style="display:grid;gap:8px">
+        <p>Os PDFs ficaram prontos, mas o Android pede um novo toque para abrir o compartilhamento.</p>
+        <button id="env-share2" class="btn primary" type="button">Abrir compartilhamento</button>
+      </div>
+    </section>
   </div>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="jspdf.umd.min.js"></script>
+<script src="xlsx.mini.min.js"></script>
 <script>
 (function () {
   'use strict';
@@ -271,9 +391,10 @@ button { font: inherit; cursor: pointer; }
   function vazio(manter) {
     manter = manter || {};
     return {
-      nome: manter.nome || '', tipo: manter.tipo || '', data: hojeISO(),
+      proj: manter.proj || '', nome: manter.nome || '', tipo: manter.tipo || '', data: hojeISO(),
       lat: '', lon: '', acc: null, alt: null, gpsHora: null, gpsFonte: '',
-      equip: manter.equip || '', altAnt: '', tipoAlt: '', obs: '', fotos: []
+      equip: manter.equip || '', altAnt: '', tipoAlt: '', obs: '', fotos: [],
+      id: null, salvoEm: null, sujo: false
     };
   }
 
@@ -310,50 +431,83 @@ button { font: inherit; cursor: pointer; }
       } catch (e) { ok(false); }
     });
   }
+  function dbDel(k) {
+    return new Promise(function (ok) {
+      if (!idb) return ok(false);
+      try {
+        var tx = idb.transaction('kv', 'readwrite');
+        tx.objectStore('kv').delete(k);
+        tx.oncomplete = function () { ok(true); };
+        tx.onerror = function () { ok(false); };
+      } catch (e) { ok(false); }
+    });
+  }
   var tSalvar = null;
+  function persistirRascunho() {
+    return dbSet('rascunho', estado).then(function (okk) {
+      $('saved').textContent = okk ? 'Rascunho salvo automaticamente neste aparelho.' : 'Não foi possível guardar o rascunho neste aparelho.';
+    });
+  }
   function agendarSalvar() {
-    clearTimeout(tSalvar);
-    tSalvar = setTimeout(function () {
-      dbSet('rascunho', estado).then(function (okk) {
-        $('saved').textContent = okk ? 'Rascunho salvo neste aparelho.' : 'Não foi possível salvar o rascunho neste aparelho.';
-      });
-      salvarEquip(estado.equip);
-    }, 400);
+    if (estado.id) estado.sujo = true;
+    atualizarBotoes();
+    clearTimeout(tSalvar); tSalvar = setTimeout(persistirRascunho, 400);
   }
-  function equipsSalvos() {
-    try { return JSON.parse(localStorage.getItem('m3e-equips') || '[]'); } catch (e) { return []; }
+  /* ---------- Listas (projetos, colaboradores, tipos, equipamentos) ---------- */
+  var LISTAS_PADRAO = {
+    projetos: ['1 - Teste', '2 - Teste', '3 - Teste', '4 - Teste', '5 - Teste', '6 - Teste', '7 - Teste', '8 - Teste', '9 - Teste', '10 - Teste'],
+    colaboradores: ['A', 'B', 'C', 'D', 'E', 'F'],
+    tipos: ['Ponto de Controle', 'Marcos Geodéciso', 'Base Drone', 'Base RTK'],
+    equipamentos: ['Emelid -1', 'CHC i71', 'Emelid -2']
+  };
+  var NOMES = { projetos: 'Projetos', colaboradores: 'Colaboradores', tipos: 'Tipos de levantamento', equipamentos: 'Equipamentos' };
+  var CAMPOS = [
+    { lista: 'projetos', id: 'f-proj', est: 'proj' },
+    { lista: 'colaboradores', id: 'f-nome', est: 'nome' },
+    { lista: 'tipos', id: 'f-tipo', est: 'tipo' },
+    { lista: 'equipamentos', id: 'f-equip', est: 'equip' }
+  ];
+  function copiarListas(o) { var r = {}; Object.keys(NOMES).forEach(function (k) { r[k] = (o[k] || []).slice(); }); return r; }
+  var listas = copiarListas(LISTAS_PADRAO), metaListas = null;
+  function salvarListas() { return dbSet('listas', { listas: listas, meta: metaListas }); }
+  function limpaItem(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim(); }
+  function normaliza(t) { return limpaItem(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function unir(base, extra) {
+    var vistos = {}, out = [];
+    base.concat(extra).forEach(function (x) {
+      x = limpaItem(x); var k = x.toLowerCase();
+      if (x && !vistos[k]) { vistos[k] = 1; out.push(x); }
+    });
+    return out;
   }
-  function salvarEquip(nome) {
-    nome = (nome || '').trim();
-    if (!nome) return;
-    try {
-      var l = equipsSalvos().filter(function (x) { return x !== nome; });
-      l.unshift(nome);
-      localStorage.setItem('m3e-equips', JSON.stringify(l.slice(0, 12)));
-    } catch (e) {}
+  function montarSelect(c) {
+    var sel = $(c.id), atual = estado[c.est] || '', itens = listas[c.lista].slice();
+    if (atual && itens.indexOf(atual) < 0) itens.unshift(atual);
+    sel.innerHTML = '';
+    function opt(v, t) { var o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); }
+    opt('', 'Selecione…');
+    itens.forEach(function (x) { opt(x, x); });
+    opt('__novo__', '+ Adicionar novo item…');
+    sel.value = atual;
   }
-  function montarDatalist() {
-    var base = ['Receptor GNSS', 'Estação total', 'Nível digital', 'Scanner laser móvel (MLS)', 'Drone com LiDAR'];
-    var l = equipsSalvos().concat(base.filter(function (b) { return equipsSalvos().indexOf(b) < 0; }));
-    $('dl-equip').innerHTML = '';
-    l.forEach(function (n) { var o = document.createElement('option'); o.value = n; $('dl-equip').appendChild(o); });
-  }
+  function montarSelects() { CAMPOS.forEach(montarSelect); }
 
   /* ---------- Formulário <-> estado ---------- */
   function paraTela() {
-    $('f-nome').value = estado.nome; $('f-tipo').value = estado.tipo; $('f-data').value = estado.data;
+    montarSelects(); $('f-data').value = estado.data;
     $('f-lat').value = estado.lat; $('f-lon').value = estado.lon;
-    $('f-equip').value = estado.equip; $('f-alt').value = estado.altAnt; $('f-obs').value = estado.obs;
+    $('f-alt').value = estado.altAnt; $('f-obs').value = estado.obs;
     document.querySelectorAll('input[name=tipoalt]').forEach(function (r) { r.checked = (r.value === estado.tipoAlt); });
-    mostrarGPS(); desenharFotos();
+    mostrarGPS(); desenharFotos(); atualizarBotoes();
   }
   function daTela() {
-    estado.nome = $('f-nome').value; estado.tipo = $('f-tipo').value; estado.data = $('f-data').value;
+    estado.data = $('f-data').value;
     estado.lat = $('f-lat').value; estado.lon = $('f-lon').value;
-    estado.equip = $('f-equip').value; estado.altAnt = $('f-alt').value; estado.obs = $('f-obs').value;
+    estado.altAnt = $('f-alt').value; estado.obs = $('f-obs').value;
+    CAMPOS.forEach(function (c) { var v = $(c.id).value; if (v !== '__novo__') estado[c.est] = v; });
     var r = document.querySelector('input[name=tipoalt]:checked'); estado.tipoAlt = r ? r.value : '';
   }
-  ['f-nome', 'f-tipo', 'f-data', 'f-equip', 'f-alt', 'f-obs'].forEach(function (id) {
+  ['f-data', 'f-alt', 'f-obs'].forEach(function (id) {
     $(id).addEventListener('input', function () { daTela(); limparErro(id); agendarSalvar(); });
     $(id).addEventListener('change', function () { daTela(); limparErro(id); agendarSalvar(); });
   });
@@ -366,6 +520,162 @@ button { font: inherit; cursor: pointer; }
       estado.gpsFonte = 'manual'; estado.acc = null; estado.alt = null; estado.gpsHora = null;
       limparErro(id); mostrarGPS(); agendarSalvar();
     });
+  });
+
+  /* ---------- Seleção e inclusão de itens nas listas ---------- */
+  CAMPOS.forEach(function (c) {
+    var sel = $(c.id), linha = $('add-' + c.lista), inp = $('n-' + c.lista);
+    function fechar() { linha.hidden = true; inp.value = ''; montarSelect(c); }
+    function confirmar() {
+      var v = limpaItem(inp.value);
+      if (!v) { inp.focus(); return; }
+      var existente = null;
+      listas[c.lista].forEach(function (x) { if (x.toLowerCase() === v.toLowerCase()) existente = x; });
+      if (!existente) { listas[c.lista].push(v); salvarListas(); }
+      estado[c.est] = existente || v; linha.hidden = true; inp.value = '';
+      montarSelect(c); limparErro(c.id); agendarSalvar();
+      aviso(existente ? 'Esse item já existia e foi selecionado.' : 'Item adicionado à lista.');
+    }
+    sel.addEventListener('change', function () {
+      if (sel.value === '__novo__') { linha.hidden = false; inp.focus(); return; }
+      linha.hidden = true; estado[c.est] = sel.value; limparErro(c.id); agendarSalvar();
+    });
+    document.querySelector('[data-add="' + c.lista + '"]').addEventListener('click', confirmar);
+    document.querySelector('[data-cancel="' + c.lista + '"]').addEventListener('click', fechar);
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); confirmar(); } else if (e.key === 'Escape') { fechar(); }
+    });
+  });
+
+  /* ---------- Painel de listas: importar, exportar, remover ---------- */
+  function renderPainel() {
+    var box = $('listas-atuais'); box.innerHTML = '';
+    CAMPOS.forEach(function (c) {
+      var g = document.createElement('div'), h = document.createElement('h3'), ch = document.createElement('div');
+      g.style.cssText = 'display:grid;gap:8px'; ch.className = 'chips';
+      h.textContent = NOMES[c.lista] + ' (' + listas[c.lista].length + ')';
+      if (!listas[c.lista].length) { var v = document.createElement('p'); v.textContent = 'Lista vazia.'; ch.appendChild(v); }
+      listas[c.lista].forEach(function (item, i) {
+        var sp = document.createElement('span'), b = document.createElement('button');
+        sp.className = 'chip2'; sp.appendChild(document.createTextNode(item));
+        b.type = 'button'; b.textContent = '×'; b.setAttribute('aria-label', 'Remover ' + item);
+        b.addEventListener('click', function () {
+          listas[c.lista].splice(i, 1);
+          if (estado[c.est] === item) { estado[c.est] = ''; agendarSalvar(); }
+          salvarListas(); montarSelects(); renderPainel();
+        });
+        sp.appendChild(b); ch.appendChild(sp);
+      });
+      g.appendChild(h); g.appendChild(ch); box.appendChild(g);
+    });
+    $('meta-imp').textContent = metaListas && metaListas.arquivo
+      ? 'Última importação: ' + metaListas.arquivo + ' em ' + dataHoraBR(metaListas.quando) + '.'
+      : 'Listas iniciais vindas da planilha de base. Nenhuma importação feita neste aparelho.';
+  }
+  var sheetAberto = null, focoAntes = null;
+  function abrirSheet(id) {
+    focoAntes = document.activeElement; $(id).hidden = false; document.body.style.overflow = 'hidden'; sheetAberto = id;
+    try { history.pushState({ sheet: id }, ''); } catch (e) {}
+  }
+  function ocultarSheet() {
+    if (!sheetAberto) return;
+    $(sheetAberto).hidden = true; sheetAberto = null; document.body.style.overflow = '';
+    if (focoAntes && focoAntes.focus) focoAntes.focus();
+  }
+  function fecharSheet() { if (history.state && history.state.sheet) history.back(); else ocultarSheet(); }
+  window.addEventListener('popstate', function () { ocultarSheet(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && sheetAberto) fecharSheet(); });
+  $('btn-menu').addEventListener('click', function () { renderPainel(); abrirSheet('panel'); $('btn-panel-close').focus(); });
+  $('btn-panel-close').addEventListener('click', fecharSheet);
+  $('btn-env-close').addEventListener('click', fecharSheet);
+
+  var importacao = null;
+  function chaveDoCabecalho(t) {
+    t = normaliza(t);
+    if (t.indexOf('projeto') === 0) return 'projetos';
+    if (t.indexOf('colaborador') === 0) return 'colaboradores';
+    if (t.indexOf('tipo') === 0) return 'tipos';
+    if (t.indexOf('equip') === 0) return 'equipamentos';
+    return null;
+  }
+  function extrair(linhas) {
+    for (var h = 0; h < Math.min(linhas.length, 5); h++) {
+      var mapa = {}, n = 0;
+      linhas[h].forEach(function (cel, col) { var k = chaveDoCabecalho(cel); if (k && mapa[k] === undefined) { mapa[k] = col; n++; } });
+      if (!n) continue;
+      var out = {};
+      Object.keys(mapa).forEach(function (k) {
+        var vals = [];
+        for (var i = h + 1; i < linhas.length; i++) vals.push(linhas[i][mapa[k]]);
+        vals = unir([], vals);
+        if (vals.length) out[k] = vals;
+      });
+      return Object.keys(out).length ? out : null;
+    }
+    return null;
+  }
+  function lerPlanilha(file) {
+    return new Promise(function (ok, fail) {
+      if (!window.XLSX) { fail(new Error('Biblioteca de planilhas não carregada. Abra o app com internet uma vez.')); return; }
+      var fr = new FileReader();
+      fr.onerror = function () { fail(new Error('Não foi possível abrir o arquivo.')); };
+      fr.onload = function () {
+        var wb, achou = null;
+        try {
+          wb = XLSX.read(fr.result, { type: 'array' });
+          wb.SheetNames.forEach(function (nome) {
+            if (achou) return;
+            achou = extrair(XLSX.utils.sheet_to_json(wb.Sheets[nome], { header: 1, raw: false, defval: '' }));
+          });
+        } catch (e) { fail(new Error('Arquivo de planilha inválido.')); return; }
+        if (!achou) { fail(new Error('Não encontrei colunas com os cabeçalhos Projeto, Colaborador, Tipo de Levantamento ou Equipamento, com itens abaixo.')); return; }
+        ok({ arquivo: file.name, dados: achou });
+      };
+      fr.readAsArrayBuffer(file);
+    });
+  }
+  function mostrarResumo(msgErro) {
+    var r = $('resumo'), b = $('btn-aplicar'); r.hidden = false; r.innerHTML = '';
+    if (msgErro) { r.className = 'resumo bad'; r.textContent = msgErro; b.hidden = true; return; }
+    r.className = 'resumo';
+    var t = document.createElement('strong'); t.textContent = 'Planilha: ' + importacao.arquivo; r.appendChild(t);
+    CAMPOS.forEach(function (c) {
+      var d = document.createElement('div'), novo = importacao.dados[c.lista];
+      d.textContent = NOMES[c.lista] + ': ' + (novo ? novo.length + ' itens na planilha (hoje: ' + listas[c.lista].length + ')' : 'coluna não encontrada, lista mantida');
+      r.appendChild(d);
+    });
+    b.hidden = false;
+  }
+  $('btn-imp').addEventListener('click', function () { $('in-xlsx').click(); });
+  $('in-xlsx').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    lerPlanilha(f).then(function (res) { importacao = res; mostrarResumo(); })
+      .catch(function (err) { importacao = null; mostrarResumo(err.message); });
+  });
+  $('btn-aplicar').addEventListener('click', function () {
+    if (!importacao) return;
+    var modo = document.querySelector('input[name=modo-imp]:checked').value;
+    CAMPOS.forEach(function (c) {
+      var novo = importacao.dados[c.lista]; if (!novo) return;
+      listas[c.lista] = modo === 'somar' ? unir(listas[c.lista], novo) : novo.slice();
+    });
+    metaListas = { arquivo: importacao.arquivo, quando: Date.now() };
+    salvarListas(); montarSelects(); renderPainel();
+    $('resumo').hidden = true; $('btn-aplicar').hidden = true; importacao = null;
+    aviso('Listas atualizadas.');
+  });
+  $('btn-exp').addEventListener('click', function () {
+    if (!window.XLSX) { aviso('Biblioteca de planilhas não carregada.'); return; }
+    var n = 0, aoa = [['Projeto', 'Colaborador', 'Tipo de Levantamento', 'Equipamento']];
+    CAMPOS.forEach(function (c) { n = Math.max(n, listas[c.lista].length); });
+    for (var i = 0; i < n; i++) aoa.push(CAMPOS.map(function (c) { return listas[c.lista][i] || ''; }));
+    var ws = XLSX.utils.aoa_to_sheet(aoa), wb = XLSX.utils.book_new();
+    ws['!cols'] = [{ wch: 26 }, { wch: 26 }, { wch: 28 }, { wch: 26 }];
+    XLSX.utils.book_append_sheet(wb, ws, 'Listas');
+    var arr = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    var f = new File([arr], 'Listas_APP_Campo.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    baixar(f); aviso('Planilha de listas salva em Downloads.');
   });
 
   /* ---------- Erros ---------- */
@@ -405,11 +715,12 @@ button { font: inherit; cursor: pointer; }
     return { zona: zona, hemi: lat < 0 ? 'Sul' : 'Norte', e: E, n: Nn };
   }
   function fmt(n, d) { return n.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
-  function coordsValidas() {
-    var la = num(estado.lat), lo = num(estado.lon);
+  function coordsDe(r) {
+    var la = num(r.lat), lo = num(r.lon);
     if (isNaN(la) || isNaN(lo) || la < -90 || la > 90 || lo < -180 || lo > 180) return null;
     return { lat: la, lon: lo };
   }
+  function coordsValidas() { return coordsDe(estado); }
   function mostrarGPS() {
     var box = $('gps-out'), c = coordsValidas();
     if (!c) {
@@ -516,29 +827,32 @@ button { font: inherit; cursor: pointer; }
   });
 
   /* ---------- Validação ---------- */
+  function faltas(r) {
+    var f = [];
+    if (!r.proj) f.push(['f-proj', 'Selecione o projeto.']);
+    if (!String(r.nome).trim()) f.push(['f-nome', 'Selecione o colaborador.']);
+    if (!r.tipo) f.push(['f-tipo', 'Selecione o tipo de levantamento.']);
+    if (!r.data) f.push(['f-data', 'Informe a data.']);
+    var la = num(r.lat), lo = num(r.lon);
+    if (isNaN(la) || la < -90 || la > 90) f.push(['f-lat', 'Latitude inválida.']);
+    if (isNaN(lo) || lo < -180 || lo > 180) f.push(['f-lon', 'Longitude inválida.']);
+    if (!String(r.equip).trim()) f.push(['f-equip', 'Selecione o equipamento.']);
+    var h = num(r.altAnt);
+    if (isNaN(h) || h < 0) f.push(['f-alt', 'Informe a altura da antena em cm.']);
+    if (!r.tipoAlt) f.push(['tipoalt', 'Escolha vertical ou inclinada.']);
+    if (r.fotos.length < MIN_FOTOS) f.push(['fotos', 'Anexe pelo menos ' + MIN_FOTOS + ' fotos.']);
+    return f;
+  }
   function validar() {
     daTela(); limparTodosErros();
-    var primeiro = null;
-    function falha(id, txt) { erro(id, txt); if (!primeiro) primeiro = id; }
-    if (!estado.nome.trim()) falha('f-nome', 'Informe o nome do colaborador.');
-    if (!estado.tipo) falha('f-tipo', 'Selecione o tipo de levantamento.');
-    if (!estado.data) falha('f-data', 'Informe a data.');
-    var la = num(estado.lat), lo = num(estado.lon);
-    if (isNaN(la) || la < -90 || la > 90) falha('f-lat', 'Latitude inválida.');
-    if (isNaN(lo) || lo < -180 || lo > 180) falha('f-lon', 'Longitude inválida.');
-    if (!estado.equip.trim()) falha('f-equip', 'Informe o equipamento.');
-    var h = num(estado.altAnt);
-    if (isNaN(h) || h < 0) falha('f-alt', 'Informe a altura da antena em cm.');
-    if (!estado.tipoAlt) falha('tipoalt', 'Escolha vertical ou inclinada.');
-    if (estado.fotos.length < MIN_FOTOS) falha('fotos', 'Anexe pelo menos ' + MIN_FOTOS + ' fotos.');
-    if (primeiro) {
-      var alvo = $(primeiro) || document.querySelector('.msg[data-for="' + primeiro + '"]');
-      if (alvo && alvo.scrollIntoView) alvo.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      if (alvo && alvo.focus && $(primeiro)) alvo.focus({ preventScroll: true });
-      aviso('Faltam dados para gerar o relatório.');
-      return false;
-    }
-    return true;
+    var f = faltas(estado);
+    f.forEach(function (x) { erro(x[0], x[1]); });
+    if (!f.length) return true;
+    var primeiro = f[0][0], alvo = $(primeiro) || document.querySelector('.msg[data-for="' + primeiro + '"]');
+    if (alvo && alvo.scrollIntoView) alvo.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (alvo && alvo.focus && $(primeiro)) alvo.focus({ preventScroll: true });
+    aviso('Faltam dados para salvar o relatório.');
+    return false;
   }
 
   /* ---------- PDF ---------- */
@@ -550,13 +864,17 @@ button { font: inherit; cursor: pointer; }
   function slug(s) {
     return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
   }
-  function nomeArquivo() {
-    return 'Relatorio_' + slug(estado.tipo.split('(')[0]) + '_' + slug(estado.nome) + '_' + estado.data + '.pdf';
+  function nomeArquivo(r, usados) {
+    var base = 'Relatorio_' + slug(r.proj) + '_' + slug(r.tipo.split('(')[0]) + '_' + slug(r.nome) + '_' + r.data, nome = base + '.pdf', n = 1;
+    if (usados) { while (usados[nome]) { n++; nome = base + '_' + n + '.pdf'; } usados[nome] = 1; }
+    return nome;
   }
-  function montarPDF() {
+  function montarPDF(estado, docExistente) {
     var J = window.jspdf && window.jspdf.jsPDF;
     if (!J) throw new Error('Biblioteca de PDF não carregada.');
-    var doc = new J({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    var doc = docExistente || new J({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    if (docExistente) doc.addPage();
+    var inicio = doc.getNumberOfPages();
     var W = 210, H = 297, M = 14, CW = W - 2 * M, RODAPE = 16;
     var NAVY = [11, 37, 69], TEAL = [11, 127, 120], CINZA = [86, 104, 130], LINHA = [204, 215, 227], PAINEL = [240, 245, 250];
 
@@ -582,17 +900,17 @@ button { font: inherit; cursor: pointer; }
       doc.text(linhas, x, yy + 5.2);
       return 5.2 + linhas.length * 4.6;
     }
-    var colW = CW / 2, h1 = Math.max(campo(M, y, colW, 'Colaborador', estado.nome.trim()), campo(M + colW, y, colW, 'Tipo de levantamento', estado.tipo));
+    var colW = CW / 2;
+    var h0 = Math.max(campo(M, y, colW, 'Projeto', estado.proj), campo(M + colW, y, colW, 'Colaborador', estado.nome.trim()));
+    y += h0 + 4;
+    var h1 = Math.max(campo(M, y, colW, 'Tipo de levantamento', estado.tipo), campo(M + colW, y, colW, 'Equipamento', estado.equip.trim()));
     y += h1 + 4;
-    var c3 = CW / 3, h2 = Math.max(
-      campo(M, y, c3 * 1.2, 'Equipamento', estado.equip.trim()),
-      campo(M + c3 * 1.2, y, c3 * 0.9, 'Altura da antena', fmt(num(estado.altAnt), 1) + ' cm'),
-      campo(M + c3 * 2.1, y, c3 * 0.9, 'Tipo de altura', estado.tipoAlt));
+    var h2 = Math.max(campo(M, y, colW, 'Altura da antena', fmt(num(estado.altAnt), 1) + ' cm'), campo(M + colW, y, colW, 'Tipo de altura', estado.tipoAlt));
     y += h2 + 3;
     doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 6;
 
     /* coordenadas */
-    var c = coordsValidas(), u = utm(c.lat, c.lon);
+    var c = coordsDe(estado), u = utm(c.lat, c.lon);
     var pH = 31;
     doc.setFillColor.apply(doc, PAINEL); doc.roundedRect(M, y, CW, pH, 1.5, 1.5, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, TEAL);
@@ -641,57 +959,224 @@ button { font: inherit; cursor: pointer; }
 
     /* rodapé */
     var total = doc.getNumberOfPages(), agora = dataHoraBR(Date.now());
-    for (var p = 1; p <= total; p++) {
+    for (var p = inicio; p <= total; p++) {
       doc.setPage(p);
       doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.3); doc.line(M, H - 12, W - M, H - 12);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, CINZA);
-      doc.text('Relatório de campo · ' + estado.nome.trim() + ' · gerado em ' + agora, M, H - 7.5);
-      doc.text('Página ' + p + ' de ' + total, W - M, H - 7.5, { align: 'right' });
+      doc.text('Relatório de campo · ' + estado.proj + ' · ' + estado.nome.trim() + ' · gerado em ' + agora, M, H - 7.5);
+      doc.text('Página ' + (p - inicio + 1) + ' de ' + (total - inicio + 1), W - M, H - 7.5, { align: 'right' });
     }
     return doc;
-  }
-  function gerar() {
-    if (!validar()) return null;
-    try {
-      var doc = montarPDF();
-      return new File([doc.output('blob')], nomeArquivo(), { type: 'application/pdf' });
-    } catch (e) { aviso('Erro ao gerar o PDF: ' + e.message, 7000); return null; }
   }
   function baixar(file) {
     var url = URL.createObjectURL(file), a = document.createElement('a');
     a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
   }
-  $('btn-pdf').addEventListener('click', function () {
-    var f = gerar(); if (!f) return; baixar(f); aviso('PDF salvo em Downloads: ' + f.name, 6000);
-  });
-  $('btn-share').addEventListener('click', function () {
-    var f = gerar(); if (!f) return;
-    var texto = 'Relatório de campo · ' + estado.nome.trim() + ' · ' + dataBR(estado.data);
-    if (navigator.canShare && navigator.canShare({ files: [f] })) {
-      navigator.share({ files: [f], title: texto, text: texto }).catch(function (e) {
-        if (e && e.name !== 'AbortError') { baixar(f); aviso('Não foi possível abrir o compartilhamento. PDF salvo em Downloads.', 6000); }
-      });
-    } else {
-      baixar(f); aviso('Este navegador não compartilha arquivos. PDF salvo em Downloads: anexe no WhatsApp ou e-mail.', 7000);
-    }
-  });
 
-  /* ---------- Novo relatório (confirmação em dois toques) ---------- */
-  var armado = false, tArma = null;
+  /* ---------- Relatórios salvos ---------- */
+  var indice = [];   // metadados dos relatórios salvos, do mais recente para o mais antigo
+  function novoId() { return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function metaDe(r) { return { id: r.id, proj: r.proj, nome: r.nome, tipo: r.tipo, equip: r.equip, data: r.data, nFotos: r.fotos.length, salvoEm: r.salvoEm }; }
+  function hhmm(ts) { var d = new Date(ts), p = function (n) { return String(n).padStart(2, '0'); }; return p(d.getHours()) + ':' + p(d.getMinutes()); }
+  function salvoELimpo() { return !!estado.id && !estado.sujo; }
+  function atualizarBotoes() {
+    var salvo = salvoELimpo(), st = $('status-rel');
+    document.querySelectorAll('[data-acao="salvar"]').forEach(function (b) {
+      b.textContent = !estado.id ? 'Salvar relatório' : (estado.sujo ? 'Salvar alterações' : 'Relatório salvo');
+      b.disabled = salvo;
+    });
+    $('btn-new').disabled = !salvo; $('btn-new').className = 'btn' + (salvo ? ' primary' : '');
+    $('btn-clear').hidden = !!estado.id;
+    $('btn-send').textContent = 'Enviar' + (indice.length ? ' (' + indice.length + ')' : '');
+    if (!estado.id) st.textContent = 'Este relatório ainda não foi salvo.';
+    else if (estado.sujo) st.textContent = 'Há alterações não salvas neste relatório.';
+    else st.textContent = 'Relatório salvo às ' + hhmm(estado.salvoEm) + '. Já pode iniciar o próximo.';
+  }
+  function salvarRelatorio() {
+    if (!validar()) return;
+    var rec = Object.assign({}, estado, { id: estado.id || novoId(), salvoEm: Date.now(), sujo: false });
+    dbSet('r:' + rec.id, rec).then(function (ok) {
+      if (!ok) { aviso('Não foi possível salvar neste aparelho. Verifique o armazenamento do navegador.', 7000); return; }
+      indice = indice.filter(function (m) { return m.id !== rec.id; });
+      indice.unshift(metaDe(rec));
+      dbSet('indice', indice);
+      estado.id = rec.id; estado.salvoEm = rec.salvoEm; estado.sujo = false;
+      persistirRascunho(); atualizarBotoes();
+      aviso('Relatório salvo. Total de relatórios salvos: ' + indice.length + '.', 5000);
+    });
+  }
+  document.querySelectorAll('[data-acao="salvar"]').forEach(function (b) { b.addEventListener('click', salvarRelatorio); });
+
+  function manterDoAnterior() { return { proj: estado.proj, nome: estado.nome, tipo: estado.tipo, equip: estado.equip }; }
   $('btn-new').addEventListener('click', function () {
-    var b = $('btn-new');
-    if (!armado) {
-      armado = true; b.textContent = 'Toque de novo para apagar tudo';
-      tArma = setTimeout(function () { armado = false; b.textContent = 'Novo relatório'; }, 4000);
+    if (!salvoELimpo()) { aviso('Salve o relatório atual antes de iniciar um novo.'); return; }
+    pararGPS();
+    estado = vazio(manterDoAnterior());
+    limparTodosErros(); paraTela(); persistirRascunho();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    aviso('Novo relatório iniciado com os dados do anterior.', 5000);
+  });
+  var limpaArmado = false, tLimpa = null;
+  $('btn-clear').addEventListener('click', function () {
+    var b = $('btn-clear');
+    if (!limpaArmado) {
+      limpaArmado = true; b.textContent = 'Toque de novo para limpar';
+      tLimpa = setTimeout(function () { limpaArmado = false; b.textContent = 'Limpar dados deste ponto'; }, 4000);
       return;
     }
-    clearTimeout(tArma); armado = false; b.textContent = 'Novo relatório';
-    pararGPS(); daTela();
-    estado = vazio({ nome: estado.nome, tipo: estado.tipo, equip: estado.equip });
-    limparTodosErros(); paraTela(); agendarSalvar(); window.scrollTo({ top: 0, behavior: 'smooth' });
-    aviso('Novo relatório iniciado.');
+    clearTimeout(tLimpa); limpaArmado = false; b.textContent = 'Limpar dados deste ponto';
+    pararGPS(); estado = vazio(manterDoAnterior());
+    limparTodosErros(); paraTela(); persistirRascunho(); aviso('Dados do ponto limpos.');
   });
+
+  /* ---------- Enviar vários relatórios ---------- */
+  var selEnv = {}, itensEnv = [], preparados = null, ocupado = false, tExcluir = null, excluirArmado = null;
+  function temDadosDoPonto(r) { return !!(r.lat || r.lon || r.altAnt || r.tipoAlt || r.obs || r.fotos.length); }
+  function listaParaEnvio() {
+    daTela();
+    var itens = [];
+    if (estado.id || temDadosDoPonto(estado)) {
+      var f = faltas(estado);
+      itens.push({
+        id: estado.id || 'atual', atual: true, ok: f.length === 0,
+        m: { proj: estado.proj, nome: estado.nome, tipo: estado.tipo, equip: estado.equip, data: estado.data, nFotos: estado.fotos.length },
+        tag: !estado.id ? 'Atual, ainda não salvo' : (estado.sujo ? 'Atual, com alterações não salvas' : 'Atual')
+      });
+    }
+    indice.forEach(function (m) { if (m.id !== estado.id) itens.push({ id: m.id, atual: false, ok: true, m: m, tag: '' }); });
+    return itens;
+  }
+  function contarEnvio() {
+    var n = itensEnv.filter(function (it) { return it.ok && selEnv[it.id]; }).length;
+    $('env-count').textContent = n + ' de ' + itensEnv.length + (itensEnv.length === 1 ? ' relatório selecionado' : ' relatórios selecionados');
+    $('env-share').disabled = $('env-down').disabled = ocupado || !n;
+  }
+  function renderEnvio() {
+    var box = $('env-lista'); box.innerHTML = ''; itensEnv = listaParaEnvio();
+    $('env-vazio').hidden = itensEnv.length > 0;
+    $('env-todos').disabled = $('env-nenhum').disabled = !itensEnv.length;
+    itensEnv.forEach(function (it) {
+      var row = document.createElement('div'), lab = document.createElement('label'), cb = document.createElement('input'), tx = document.createElement('span');
+      row.className = 'relrow'; lab.className = 'rel'; tx.className = 'rt';
+      cb.type = 'checkbox'; cb.checked = !!selEnv[it.id] && it.ok; cb.disabled = !it.ok;
+      cb.addEventListener('change', function () { selEnv[it.id] = cb.checked; contarEnvio(); });
+      var t1 = document.createElement('b'), t2 = document.createElement('small');
+      t1.textContent = (it.m.proj || 'Sem projeto') + ' · ' + (it.m.nome || 'Sem colaborador');
+      t2.textContent = [it.m.tipo, it.m.equip, it.m.data ? dataBR(it.m.data) : '', it.m.nFotos + (it.m.nFotos === 1 ? ' foto' : ' fotos')].filter(Boolean).join(' · ');
+      tx.appendChild(t1); tx.appendChild(t2);
+      if (it.tag || !it.ok) {
+        var tg = document.createElement('em'); tg.className = 'tag';
+        tg.textContent = (it.tag || '') + (!it.ok ? (it.tag ? ' · ' : '') + 'incompleto, não pode ser enviado' : '');
+        tx.appendChild(tg);
+      }
+      lab.appendChild(cb); lab.appendChild(tx); row.appendChild(lab);
+      if (it.id !== 'atual') {
+        var ac = document.createElement('div'), ed = document.createElement('button'), ex = document.createElement('button');
+        ac.className = 'relact';
+        ed.type = 'button'; ed.className = 'btn'; ed.textContent = 'Editar'; ed.hidden = (it.id === estado.id);
+        ed.addEventListener('click', function () { editarSalvo(it.id); });
+        ex.type = 'button'; ex.className = 'btn danger'; ex.textContent = excluirArmado === it.id ? 'Confirmar' : 'Excluir';
+        ex.addEventListener('click', function () {
+          if (excluirArmado !== it.id) {
+            excluirArmado = it.id; clearTimeout(tExcluir);
+            tExcluir = setTimeout(function () { excluirArmado = null; renderEnvio(); }, 3500);
+            renderEnvio(); return;
+          }
+          excluirSalvo(it.id);
+        });
+        ac.appendChild(ed); ac.appendChild(ex); row.appendChild(ac);
+      }
+      box.appendChild(row);
+    });
+    contarEnvio();
+  }
+  function abrirEnvio() {
+    daTela(); selEnv = {}; preparados = null; excluirArmado = null; $('env-pronto').hidden = true;
+    var lista = listaParaEnvio();
+    if (lista.length && lista[0].atual && lista[0].ok) selEnv[lista[0].id] = true;   // começa pelo atual
+    renderEnvio(); abrirSheet('panel-env'); $('btn-env-close').focus();
+  }
+  $('btn-send').addEventListener('click', abrirEnvio);
+  $('env-todos').addEventListener('click', function () { itensEnv.forEach(function (it) { if (it.ok) selEnv[it.id] = true; }); renderEnvio(); });
+  $('env-nenhum').addEventListener('click', function () { selEnv = {}; renderEnvio(); });
+
+  function editarSalvo(id) {
+    if (temDadosDoPonto(estado) && !salvoELimpo()) { aviso('Salve o relatório atual antes de abrir outro para editar.', 5000); return; }
+    dbGet('r:' + id).then(function (r) {
+      if (!r) { aviso('Relatório não encontrado neste aparelho.'); return; }
+      pararGPS(); estado = Object.assign(vazio(), r, { sujo: false });
+      limparTodosErros(); paraTela(); persistirRascunho(); fecharSheet();
+      window.scrollTo({ top: 0 }); aviso('Relatório aberto para edição.', 4000);
+    });
+  }
+  function excluirSalvo(id) {
+    clearTimeout(tExcluir); excluirArmado = null;
+    dbDel('r:' + id).then(function () {
+      indice = indice.filter(function (m) { return m.id !== id; });
+      dbSet('indice', indice); delete selEnv[id];
+      if (estado.id === id) { estado.id = null; estado.salvoEm = null; estado.sujo = false; persistirRascunho(); }
+      atualizarBotoes(); renderEnvio(); aviso('Relatório excluído deste aparelho.');
+    });
+  }
+
+  function obterRelatorio(id) {
+    if (id === 'atual' || id === estado.id) { daTela(); return Promise.resolve(estado); }
+    return dbGet('r:' + id);
+  }
+  function gerarArquivos(ids, formato, progresso) {
+    return new Promise(function (ok, fail) {
+      var arquivos = [], doc = null, i = 0, usados = {}, primeiro = null, J = window.jspdf && window.jspdf.jsPDF;
+      if (!J) { fail(new Error('Biblioteca de PDF não carregada.')); return; }
+      function passo() {
+        if (i >= ids.length) {
+          if (formato === 'unico') arquivos.push(new File([doc.output('blob')], 'Relatorios_M3E_' + ids.length + '_' + hojeISO() + '.pdf', { type: 'application/pdf' }));
+          ok({ arquivos: arquivos, texto: ids.length === 1 ? 'Relatório de campo · ' + primeiro.proj + ' · ' + primeiro.nome.trim() + ' · ' + dataBR(primeiro.data) : ids.length + ' relatórios de campo · M3E' });
+          return;
+        }
+        progresso(i + 1, ids.length);
+        obterRelatorio(ids[i]).then(function (r) {
+          if (!r) throw new Error('Um dos relatórios não foi encontrado.');
+          if (!primeiro) primeiro = r;
+          if (formato === 'unico') { doc = montarPDF(r, doc); }
+          else { arquivos.push(new File([montarPDF(r).output('blob')], nomeArquivo(r, usados), { type: 'application/pdf' })); }
+          i++; setTimeout(passo, 0);
+        }).catch(fail);
+      }
+      passo();
+    });
+  }
+  function ocuparEnvio(sim) { ocupado = sim; contarEnvio(); }
+  function baixarTodos(arq) {
+    arq.forEach(function (f, i) { setTimeout(function () { baixar(f); }, i * 450); });
+    aviso(arq.length + (arq.length > 1 ? ' PDFs salvos' : ' PDF salvo') + ' em Downloads.', 6000);
+  }
+  function compartilhar(res) {
+    var arq = res.arquivos;
+    if (navigator.canShare && navigator.canShare({ files: arq })) {
+      navigator.share({ files: arq, title: res.texto, text: res.texto }).catch(function (e) {
+        if (!e || e.name === 'AbortError') return;
+        if (e.name === 'NotAllowedError') { preparados = res; $('env-pronto').hidden = false; aviso('PDFs prontos. Toque em Abrir compartilhamento.', 6000); return; }
+        baixarTodos(arq); aviso('Não foi possível abrir o compartilhamento. PDFs salvos em Downloads.', 6000);
+      });
+    } else {
+      baixarTodos(arq); aviso('Este navegador não compartilha arquivos. PDFs salvos em Downloads: anexe no WhatsApp ou e-mail.', 7000);
+    }
+  }
+  function enviar(modo) {
+    var ids = itensEnv.filter(function (it) { return it.ok && selEnv[it.id]; }).map(function (it) { return it.id; });
+    if (!ids.length) { aviso('Selecione ao menos um relatório.'); return; }
+    ids.reverse();   // PDFs em ordem cronológica: do mais antigo ao mais recente
+    var formato = document.querySelector('input[name=fmt-env]:checked').value;
+    $('env-pronto').hidden = true; preparados = null; ocuparEnvio(true);
+    gerarArquivos(ids, formato, function (i, n) { aviso('Gerando PDF ' + i + ' de ' + n + '…', 120000); }).then(function (res) {
+      $('toast').hidden = true; ocuparEnvio(false);
+      if (modo === 'baixar') baixarTodos(res.arquivos); else compartilhar(res);
+    }).catch(function (e) { ocuparEnvio(false); aviso('Erro ao gerar o PDF: ' + e.message, 7000); });
+  }
+  $('env-share').addEventListener('click', function () { enviar('compartilhar'); });
+  $('env-down').addEventListener('click', function () { enviar('baixar'); });
+  $('env-share2').addEventListener('click', function () { if (preparados) { var r = preparados; $('env-pronto').hidden = true; compartilhar(r); } });
 
   /* ---------- Rede, instalação e service worker ---------- */
   function rede() {
@@ -710,12 +1195,21 @@ button { font: inherit; cursor: pointer; }
   }
 
   /* ---------- Início ---------- */
-  abrirDB().then(function () { return dbGet('rascunho'); }).then(function (r) {
+  abrirDB().then(function () { return Promise.all([dbGet('rascunho'), dbGet('listas'), dbGet('indice')]); }).then(function (res) {
+    var r = res[0], l = res[1];
+    indice = Array.isArray(res[2]) ? res[2] : [];
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+    if (l && l.listas) {
+      listas = copiarListas(l.listas); metaListas = l.meta || null;
+    } else {
+      try { listas.equipamentos = unir(listas.equipamentos, JSON.parse(localStorage.getItem('m3e-equips') || '[]')); } catch (e) {}
+      salvarListas();
+    }
     if (r && typeof r === 'object') {
       estado = Object.assign(vazio(), r);
       if (!estado.data) estado.data = hojeISO();
     }
-    montarDatalist(); paraTela();
+    paraTela();
   });
 })();
 </script>
