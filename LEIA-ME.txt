@@ -1,7 +1,8 @@
-RELATÓRIO DE CAMPO M3E - app de coleta de dados de topografia (PWA)  -  versão 3
+RELATÓRIO DE CAMPO M3E - app de coleta de dados de topografia (PWA)  -  versão 6
 
 O QUE FAZ
-- Cada relatório tem: projeto, colaborador, tipo de levantamento, data, coordenadas
+- Cada relatório tem: projeto, colaborador, tipo de levantamento, data, nome do vértice
+  (obrigatório; não é repetido no novo relatório), coordenadas
   (GPS do aparelho), equipamento, altura da antena (cm), tipo de altura
   (vertical/inclinada), observações e fotos (mínimo 2).
 - Projeto, colaborador, tipo de levantamento e equipamento são listas suspensas,
@@ -19,13 +20,15 @@ FLUXO NO CAMPO
 4. Botão Enviar: o relatório atual vem marcado e aparece primeiro. Use
    "Selecionar todos" ou marque um a um. Em "Compartilhar" abre o WhatsApp/e-mail
    com os PDFs anexados; "Baixar" salva em Downloads.
-5. Em Enviar também dá para Editar ou Excluir um relatório salvo.
+5. Em Enviar também é possível editar ou excluir um relatório salvo.
 
 LISTAS (botão "Listas" no topo)
 - Importar planilha (.xlsx ou .csv) com cabeçalhos: Projeto, Colaborador,
   Tipo de Levantamento, Equipamento. Uma coluna por lista.
   "Substituir" troca a lista pelo conteúdo da planilha; "Somar" acrescenta sem repetir.
   Colunas ausentes mantêm a lista atual.
+- As listas atuais aparecem só para consulta. Itens novos entram pela opção
+  "+ Adicionar novo item..." no fim de cada lista suspensa.
 - Exportar: baixa as listas atuais (com os itens adicionados no aparelho) no mesmo
   formato, para atualizar a planilha mestre.
 - As listas ficam em cada aparelho. Para padronizar a equipe, distribua a planilha
@@ -33,17 +36,18 @@ LISTAS (botão "Listas" no topo)
 
 ARQUIVOS (manter todos juntos na mesma pasta)
   index.html, jspdf.umd.min.js, xlsx.mini.min.js, manifest.webmanifest, sw.js,
-  icon-192.png, icon-512.png, icon-maskable-512.png
+  logo-m3e.png, icon-192.png, icon-512.png, icon-maskable-512.png
 
 IMPORTANTE: GPS, modo offline e instalação só funcionam com HTTPS.
 Abrir o index.html direto do celular (file://) não serve.
 
 PUBLICAR / ATUALIZAR NO GITHUB PAGES
 1. No repositório, clique em Add file > Upload files e envie TODOS os arquivos
-   desta pasta, inclusive o novo xlsx.mini.min.js. Confirme com Commit changes.
+   desta pasta, inclusive o novo logo-m3e.png. Confirme com Commit changes.
 2. Aguarde 1 a 2 minutos. Nos celulares, abra o app com internet; ele baixa a
    versão nova (se ainda aparecer a antiga, feche e abra de novo).
-3. Os relatórios e as listas já salvos no aparelho são mantidos na atualização.
+3. Os nomes antigos nas listas (Emelid, Geodéciso) são corrigidos sozinhos para Emlid e Geodésicos.
+   Os relatórios e as listas já salvos no aparelho são mantidos na atualização.
 
 GERAR O APK (um arquivo para enviar pelo WhatsApp)
 1. Com o app publicado em HTTPS, acesse pwabuilder.com, cole o endereço e clique em Start.
@@ -56,4 +60,4 @@ ATENÇÃO
 - Os relatórios ficam apenas no aparelho. Limpar os dados do navegador/app apaga tudo:
   envie os PDFs antes de limpar.
 - Ao alterar qualquer arquivo do app, aumente a versão em sw.js
-  (const VERSAO = 'm3e-relatorio-v4') para os celulares receberem a atualização.
+  (const VERSAO = 'm3e-relatorio-v7') para os celulares receberem a atualização.
