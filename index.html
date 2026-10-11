@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Relatório de Campo M3E</title>
+<style>
+/* Layout: coluna única de formulário em cartões, barra de ações fixa no rodapé (uso com uma mão, em campo). */
+:root {
+  --navy: #0B2545;
+  --teal: #0B7F78;
+  --on-teal: #FFFFFF;
+  --bg: #EAF0F6;
+  --surface: #FFFFFF;
+  --ink: #0B2545;
+  --muted: #566882;
+  --line: #CCD7E3;
+  --field: #F5F8FB;
+  --danger: #B3261E;
+  --ok: #17703F;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --teal: #2CC5B9; --on-teal: #04202A;
+    --bg: #07142A; --surface: #0E2240; --ink: #E7EEF7; --muted: #9DB0C8;
+    --line: #213A5E; --field: #0A1B34; --danger: #FF8F86; --ok: #5FD392;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --teal: #2CC5B9; --on-teal: #04202A;
+  --bg: #07142A; --surface: #0E2240; --ink: #E7EEF7; --muted: #9DB0C8;
+  --line: #213A5E; --field: #0A1B34; --danger: #FF8F86; --ok: #5FD392;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 16px/1.45 var(--font);
+  padding-inline: 16px; padding-block: 0 112px;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 640px; margin-inline: auto; }
+
+header.top {
+  background: var(--navy); color: #fff;
+  margin-inline: -16px; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px;
+  position: sticky; top: 0; z-index: 5;
+}
+header.top .in { max-width: 640px; margin-inline: auto; display: flex; align-items: center; gap: 12px; }
+header.top h1 { margin: 0; font-size: 1.1rem; line-height: 1.2; font-weight: 700; letter-spacing: .01em; }
+header.top p { margin: 2px 0 0; font-size: .75rem; color: #9FE0DB; letter-spacing: .06em; text-transform: uppercase; }
+header.top .grow { flex: 1; min-width: 0; }
+.chip {
+  font-size: .72rem; font-weight: 600; padding: 4px 10px; border-radius: 99px;
+  background: rgba(255,255,255,.14); color: #fff; white-space: nowrap;
+}
+.chip::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #5FD392; margin-right: 6px; }
+.chip.off::before { background: #FFB74D; }
+#btn-install { font-size: .75rem; font-weight: 600; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.5); background: transparent; color: #fff; }
+
+main { max-width: 640px; margin-inline: auto; padding-block: 16px; display: grid; gap: 14px; }
+section.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 14px; }
+section.card > h2 { margin: 0; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+.row > * { min-width: 0; }
+@media (max-width: 440px) { .row.stack { grid-template-columns: 1fr; } }
+
+label.lbl, .lbl { display: block; font-size: .82rem; font-weight: 600; margin-bottom: 6px; }
+.lbl small { font-weight: 400; color: var(--muted); }
+input[type=text], input[type=number], input[type=date], select, textarea {
+  width: 100%; font: inherit; color: var(--ink); background: var(--field);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; min-height: 48px;
+  appearance: none; -webkit-appearance: none;
+}
+select { background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 20px) 55%, calc(100% - 14px) 55%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 36px; }
+textarea { min-height: 110px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, .seg input:focus-visible + span {
+  outline: 3px solid var(--teal); outline-offset: 2px;
+}
+.err { border-color: var(--danger) !important; }
+.msg { color: var(--danger); font-size: .8rem; margin-top: 4px; min-height: 0; }
+.hint { color: var(--muted); font-size: .78rem; margin-top: 4px; }
+
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; }
+.seg span { display: block; text-align: center; padding: 12px 8px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--field); font-weight: 600; min-height: 48px; }
+.seg input:checked + span { background: var(--teal); color: var(--on-teal); border-color: var(--teal); }
+
+button { font: inherit; cursor: pointer; }
+.btn { min-height: 48px; padding: 0 18px; border-radius: 10px; border: 1.5px solid var(--teal); background: transparent; color: var(--teal); font-weight: 700; }
+.btn.primary { background: var(--teal); color: var(--on-teal); }
+.btn:disabled { opacity: .55; }
+.btn.danger { border-color: var(--danger); color: var(--danger); }
+
+.gps-box { display: grid; gap: 10px; }
+.gps-readout { font-family: var(--mono); font-size: .82rem; background: var(--field); border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px 12px; color: var(--muted); overflow-wrap: anywhere; }
+.gps-readout b { color: var(--ink); font-weight: 600; }
+.acc-good { color: var(--ok); } .acc-bad { color: var(--danger); }
+
+.photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.photos figure { margin: 0; position: relative; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--line); background: var(--field); }
+.photos img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photos figcaption { position: absolute; left: 6px; bottom: 6px; background: rgba(11,37,69,.85); color: #fff; font-size: .72rem; padding: 2px 8px; border-radius: 99px; }
+.photos .rm { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(11,37,69,.85); color: #fff; font-size: 1.1rem; line-height: 1; }
+.slot { aspect-ratio: 4 / 3; border: 1.5px dashed var(--line); border-radius: 10px; display: grid; place-items: center; text-align: center; color: var(--muted); font-size: .8rem; padding: 8px; }
+.slot.need { border-color: var(--danger); color: var(--danger); }
+.photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.count { font-size: .8rem; font-weight: 600; }
+.count.ok { color: var(--ok); } .count.no { color: var(--danger); }
+
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.bar .in { max-width: 640px; margin-inline: auto; display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+.toast {
+  position: fixed; left: 16px; right: 16px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); z-index: 7;
+  max-width: 608px; margin-inline: auto; background: var(--navy); color: #fff; border-radius: 10px;
+  padding: 12px 14px; font-size: .88rem; box-shadow: 0 6px 24px rgba(0,0,0,.25);
+}
+.foot { text-align: center; color: var(--muted); font-size: .75rem; padding: 4px 0 8px; display: grid; gap: 8px; justify-items: center; }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: up .18s ease-out; } @keyframes up { from { transform: translateY(8px); opacity: 0; } } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="in">
+    <div class="grow">
+      <h1>Relatório de Campo</h1>
+      <p>M3E · Topografia</p>
+    </div>
+    <button id="btn-install" type="button" hidden>Instalar</button>
+    <span id="net" class="chip">Online</span>
+  </div>
+</header>
+
+<main>
+  <section class="card" aria-labelledby="h-id">
+    <h2 id="h-id">Identificação</h2>
+    <div>
+      <label class="lbl" for="f-nome">Nome do colaborador</label>
+      <input id="f-nome" type="text" autocomplete="name" autocapitalize="words" placeholder="Nome e sobrenome">
+      <div class="msg" data-for="f-nome"></div>
+    </div>
+    <div>
+      <label class="lbl" for="f-tipo">Tipo de levantamento</label>
+      <select id="f-tipo">
+        <option value="">Selecione…</option>
+        <option>Topografia convencional (estação total)</option>
+        <option>GNSS RTK</option>
+        <option>GNSS estático</option>
+        <option>Nivelamento geométrico</option>
+        <option>Mobile Laser Scanning (MLS)</option>
+        <option>Drone / LiDAR (apoio de campo)</option>
+        <option>Cadastro de faixa de domínio</option>
+        <option>Outro (descrever nas observações)</option>
+      </select>
+      <div class="msg" data-for="f-tipo"></div>
+    </div>
+    <div>
+      <label class="lbl" for="f-data">Data</label>
+      <input id="f-data" type="date">
+      <div class="msg" data-for="f-data"></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-pos">
+    <h2 id="h-pos">Coordenadas</h2>
+    <div class="gps-box">
+      <button id="btn-gps" class="btn primary" type="button">Capturar posição do GPS</button>
+      <div class="row">
+        <div>
+          <label class="lbl" for="f-lat">Latitude <small>graus decimais</small></label>
+          <input id="f-lat" type="text" inputmode="decimal" placeholder="-23.550520" autocomplete="off">
+          <div class="msg" data-for="f-lat"></div>
+        </div>
+        <div>
+          <label class="lbl" for="f-lon">Longitude <small>graus decimais</small></label>
+          <input id="f-lon" type="text" inputmode="decimal" placeholder="-46.633308" autocomplete="off">
+          <div class="msg" data-for="f-lon"></div>
+        </div>
+      </div>
+      <div id="gps-out" class="gps-readout" role="status" aria-live="polite">Toque em capturar. A posição vem do localizador do aparelho. Sem sinal, digite as coordenadas.</div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-eq">
+    <h2 id="h-eq">Equipamento e antena</h2>
+    <div>
+      <label class="lbl" for="f-equip">Equipamento</label>
+      <input id="f-equip" type="text" list="dl-equip" autocomplete="off" placeholder="Modelo / número de série">
+      <datalist id="dl-equip"></datalist>
+      <div class="msg" data-for="f-equip"></div>
+    </div>
+    <div>
+      <label class="lbl" for="f-alt">Altura da antena <small>em centímetros</small></label>
+      <input id="f-alt" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex.: 200,0">
+      <div class="msg" data-for="f-alt"></div>
+    </div>
+    <div role="radiogroup" aria-labelledby="lbl-ta">
+      <span id="lbl-ta" class="lbl">Tipo de altura</span>
+      <div class="seg">
+        <label><input type="radio" name="tipoalt" value="Vertical"><span>Vertical</span></label>
+        <label><input type="radio" name="tipoalt" value="Inclinada"><span>Inclinada</span></label>
+      </div>
+      <div class="msg" data-for="tipoalt"></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-obs">
+    <h2 id="h-obs">Observações</h2>
+    <div>
+      <label class="lbl" for="f-obs">Anotações de campo <small>opcional</small></label>
+      <textarea id="f-obs" placeholder="Condições do local, obstruções, ocorrências…"></textarea>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-fo">
+    <h2 id="h-fo">Fotos</h2>
+    <div id="count" class="count no" role="status" aria-live="polite">0 de 2 fotos obrigatórias</div>
+    <div id="photos" class="photos"></div>
+    <div class="photo-actions">
+      <button id="btn-cam" class="btn" type="button">Tirar foto</button>
+      <button id="btn-gal" class="btn" type="button">Da galeria</button>
+    </div>
+    <input id="in-cam" type="file" accept="image/*" capture="environment" hidden>
+    <input id="in-gal" type="file" accept="image/*" multiple hidden>
+    <div class="msg" data-for="fotos"></div>
+  </section>
+
+  <div class="foot">
+    <span id="saved">Rascunho salvo neste aparelho.</span>
+    <button id="btn-new" class="btn danger" type="button">Novo relatório</button>
+  </div>
+</main>
+
+<div class="bar">
+  <div class="in">
+    <button id="btn-share" class="btn primary" type="button">Compartilhar PDF</button>
+    <button id="btn-pdf" class="btn" type="button">Baixar</button>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="jspdf.umd.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var MIN_FOTOS = 2;
+  var FOTO_MAX_PX = 1600, FOTO_QUALIDADE = 0.82;
+
+  /* ---------- Estado ---------- */
+  var estado = vazio();
+  function hojeISO() {
+    var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  function vazio(manter) {
+    manter = manter || {};
+    return {
+      nome: manter.nome || '', tipo: manter.tipo || '', data: hojeISO(),
+      lat: '', lon: '', acc: null, alt: null, gpsHora: null, gpsFonte: '',
+      equip: manter.equip || '', altAnt: '', tipoAlt: '', obs: '', fotos: []
+    };
+  }
+
+  /* ---------- Armazenamento local (IndexedDB, com reserva em memória) ---------- */
+  var idb = null;
+  function abrirDB() {
+    return new Promise(function (ok) {
+      try {
+        var rq = indexedDB.open('m3e-relatorio', 1);
+        rq.onupgradeneeded = function () { rq.result.createObjectStore('kv'); };
+        rq.onsuccess = function () { idb = rq.result; ok(); };
+        rq.onerror = function () { ok(); };
+      } catch (e) { ok(); }
+    });
+  }
+  function dbGet(k) {
+    return new Promise(function (ok) {
+      if (!idb) return ok(null);
+      try {
+        var rq = idb.transaction('kv').objectStore('kv').get(k);
+        rq.onsuccess = function () { ok(rq.result || null); };
+        rq.onerror = function () { ok(null); };
+      } catch (e) { ok(null); }
+    });
+  }
+  function dbSet(k, v) {
+    return new Promise(function (ok) {
+      if (!idb) return ok(false);
+      try {
+        var tx = idb.transaction('kv', 'readwrite');
+        tx.objectStore('kv').put(v, k);
+        tx.oncomplete = function () { ok(true); };
+        tx.onerror = function () { ok(false); };
+      } catch (e) { ok(false); }
+    });
+  }
+  var tSalvar = null;
+  function agendarSalvar() {
+    clearTimeout(tSalvar);
+    tSalvar = setTimeout(function () {
+      dbSet('rascunho', estado).then(function (okk) {
+        $('saved').textContent = okk ? 'Rascunho salvo neste aparelho.' : 'Não foi possível salvar o rascunho neste aparelho.';
+      });
+      salvarEquip(estado.equip);
+    }, 400);
+  }
+  function equipsSalvos() {
+    try { return JSON.parse(localStorage.getItem('m3e-equips') || '[]'); } catch (e) { return []; }
+  }
+  function salvarEquip(nome) {
+    nome = (nome || '').trim();
+    if (!nome) return;
+    try {
+      var l = equipsSalvos().filter(function (x) { return x !== nome; });
+      l.unshift(nome);
+      localStorage.setItem('m3e-equips', JSON.stringify(l.slice(0, 12)));
+    } catch (e) {}
+  }
+  function montarDatalist() {
+    var base = ['Receptor GNSS', 'Estação total', 'Nível digital', 'Scanner laser móvel (MLS)', 'Drone com LiDAR'];
+    var l = equipsSalvos().concat(base.filter(function (b) { return equipsSalvos().indexOf(b) < 0; }));
+    $('dl-equip').innerHTML = '';
+    l.forEach(function (n) { var o = document.createElement('option'); o.value = n; $('dl-equip').appendChild(o); });
+  }
+
+  /* ---------- Formulário <-> estado ---------- */
+  function paraTela() {
+    $('f-nome').value = estado.nome; $('f-tipo').value = estado.tipo; $('f-data').value = estado.data;
+    $('f-lat').value = estado.lat; $('f-lon').value = estado.lon;
+    $('f-equip').value = estado.equip; $('f-alt').value = estado.altAnt; $('f-obs').value = estado.obs;
+    document.querySelectorAll('input[name=tipoalt]').forEach(function (r) { r.checked = (r.value === estado.tipoAlt); });
+    mostrarGPS(); desenharFotos();
+  }
+  function daTela() {
+    estado.nome = $('f-nome').value; estado.tipo = $('f-tipo').value; estado.data = $('f-data').value;
+    estado.lat = $('f-lat').value; estado.lon = $('f-lon').value;
+    estado.equip = $('f-equip').value; estado.altAnt = $('f-alt').value; estado.obs = $('f-obs').value;
+    var r = document.querySelector('input[name=tipoalt]:checked'); estado.tipoAlt = r ? r.value : '';
+  }
+  ['f-nome', 'f-tipo', 'f-data', 'f-equip', 'f-alt', 'f-obs'].forEach(function (id) {
+    $(id).addEventListener('input', function () { daTela(); limparErro(id); agendarSalvar(); });
+    $(id).addEventListener('change', function () { daTela(); limparErro(id); agendarSalvar(); });
+  });
+  document.querySelectorAll('input[name=tipoalt]').forEach(function (r) {
+    r.addEventListener('change', function () { daTela(); limparErro('tipoalt'); agendarSalvar(); });
+  });
+  ['f-lat', 'f-lon'].forEach(function (id) {
+    $(id).addEventListener('input', function () {
+      daTela();
+      estado.gpsFonte = 'manual'; estado.acc = null; estado.alt = null; estado.gpsHora = null;
+      limparErro(id); mostrarGPS(); agendarSalvar();
+    });
+  });
+
+  /* ---------- Erros ---------- */
+  function erro(id, texto) {
+    var m = document.querySelector('.msg[data-for="' + id + '"]'); if (m) m.textContent = texto;
+    var el = $(id); if (el) el.classList.add('err');
+  }
+  function limparErro(id) {
+    var m = document.querySelector('.msg[data-for="' + id + '"]'); if (m) m.textContent = '';
+    var el = $(id); if (el) el.classList.remove('err');
+  }
+  function limparTodosErros() {
+    document.querySelectorAll('.msg').forEach(function (m) { m.textContent = ''; });
+    document.querySelectorAll('.err').forEach(function (e) { e.classList.remove('err'); });
+  }
+  var tToast = null;
+  function aviso(txt, ms) {
+    var t = $('toast'); t.textContent = txt; t.hidden = false;
+    clearTimeout(tToast); tToast = setTimeout(function () { t.hidden = true; }, ms || 4500);
+  }
+
+  /* ---------- Coordenadas ---------- */
+  function num(s) { return parseFloat(String(s).trim().replace(',', '.')); }
+  function utm(lat, lon) {
+    var a = 6378137, f = 1 / 298.257222101, k0 = 0.9996, e2 = f * (2 - f), ep2 = e2 / (1 - e2), rad = Math.PI / 180;
+    var zona = Math.floor((lon + 180) / 6) + 1, lon0 = (zona * 6 - 183) * rad;
+    var p = lat * rad, l = lon * rad;
+    var sp = Math.sin(p), cp = Math.cos(p), tp = Math.tan(p);
+    var N = a / Math.sqrt(1 - e2 * sp * sp), T = tp * tp, C = ep2 * cp * cp, A = cp * (l - lon0);
+    var M = a * ((1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * Math.pow(e2, 3) / 256) * p
+      - (3 * e2 / 8 + 3 * e2 * e2 / 32 + 45 * Math.pow(e2, 3) / 1024) * Math.sin(2 * p)
+      + (15 * e2 * e2 / 256 + 45 * Math.pow(e2, 3) / 1024) * Math.sin(4 * p)
+      - (35 * Math.pow(e2, 3) / 3072) * Math.sin(6 * p));
+    var E = k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 + (5 - 18 * T + T * T + 72 * C - 58 * ep2) * Math.pow(A, 5) / 120) + 500000;
+    var Nn = k0 * (M + N * tp * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * ep2) * Math.pow(A, 6) / 720));
+    if (lat < 0) Nn += 10000000;
+    return { zona: zona, hemi: lat < 0 ? 'Sul' : 'Norte', e: E, n: Nn };
+  }
+  function fmt(n, d) { return n.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function coordsValidas() {
+    var la = num(estado.lat), lo = num(estado.lon);
+    if (isNaN(la) || isNaN(lo) || la < -90 || la > 90 || lo < -180 || lo > 180) return null;
+    return { lat: la, lon: lo };
+  }
+  function mostrarGPS() {
+    var box = $('gps-out'), c = coordsValidas();
+    if (!c) {
+      box.textContent = 'Toque em capturar. A posição vem do localizador do aparelho. Sem sinal, digite as coordenadas.';
+      return;
+    }
+    var u = utm(c.lat, c.lon);
+    var html = 'UTM WGS 84 · Zona ' + u.zona + ' ' + u.hemi + '<br>E <b>' + fmt(u.e, 2) + '</b> m · N <b>' + fmt(u.n, 2) + '</b> m';
+    if (estado.gpsFonte === 'gps' && estado.acc != null) {
+      var cls = estado.acc <= 10 ? 'acc-good' : 'acc-bad';
+      html += '<br>Precisão <b class="' + cls + '">±' + fmt(estado.acc, 1) + ' m</b>';
+      if (estado.alt != null) html += ' · Altitude <b>' + fmt(estado.alt, 1) + ' m</b>';
+    } else if (estado.gpsFonte === 'manual') {
+      html += '<br>Digitadas manualmente';
+    }
+    box.innerHTML = html;
+  }
+  var watchId = null, gpsTimer = null;
+  function pararGPS() {
+    if (watchId != null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    clearTimeout(gpsTimer); gpsTimer = null;
+    $('btn-gps').textContent = 'Capturar posição do GPS';
+  }
+  $('btn-gps').addEventListener('click', function () {
+    if (watchId != null) { pararGPS(); aviso('Posição fixada.'); return; }
+    if (!('geolocation' in navigator)) { aviso('Este aparelho não oferece localização. Digite as coordenadas.'); return; }
+    var melhor = null;
+    $('btn-gps').textContent = 'Capturando… toque para fixar';
+    $('gps-out').textContent = 'Buscando satélites…';
+    watchId = navigator.geolocation.watchPosition(function (pos) {
+      if (!melhor || pos.coords.accuracy <= melhor.coords.accuracy) {
+        melhor = pos;
+        estado.lat = pos.coords.latitude.toFixed(7); estado.lon = pos.coords.longitude.toFixed(7);
+        estado.acc = pos.coords.accuracy; estado.alt = pos.coords.altitude;
+        estado.gpsHora = pos.timestamp; estado.gpsFonte = 'gps';
+        $('f-lat').value = estado.lat; $('f-lon').value = estado.lon;
+        limparErro('f-lat'); limparErro('f-lon');
+        mostrarGPS(); agendarSalvar();
+      }
+      if (pos.coords.accuracy <= 3) { pararGPS(); aviso('Posição fixada, precisão ±' + fmt(pos.coords.accuracy, 1) + ' m.'); }
+    }, function (e) {
+      pararGPS();
+      var t = e.code === 1 ? 'Permissão de localização negada. Libere nas configurações do navegador ou digite as coordenadas.'
+        : e.code === 3 ? 'Tempo esgotado sem sinal de GPS. Vá para um local aberto ou digite as coordenadas.'
+        : 'Não foi possível obter a posição. Digite as coordenadas.';
+      $('gps-out').textContent = t; aviso(t, 6000);
+    }, { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 });
+    gpsTimer = setTimeout(function () {
+      if (watchId != null) { pararGPS(); if (melhor) aviso('Posição fixada, precisão ±' + fmt(melhor.coords.accuracy, 1) + ' m.'); }
+    }, 12000);
+  });
+
+  /* ---------- Fotos ---------- */
+  function lerArquivo(file) {
+    return new Promise(function (ok, fail) {
+      var fr = new FileReader(); fr.onload = function () { ok(fr.result); }; fr.onerror = fail; fr.readAsDataURL(file);
+    });
+  }
+  function carregarImagem(src) {
+    return new Promise(function (ok, fail) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = fail; im.src = src; });
+  }
+  function comprimir(file) {
+    return lerArquivo(file).then(carregarImagem).then(function (im) {
+      var w = im.naturalWidth, h = im.naturalHeight, s = Math.min(1, FOTO_MAX_PX / Math.max(w, h));
+      var cw = Math.round(w * s), ch = Math.round(h * s);
+      var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+      var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cw, ch); cx.drawImage(im, 0, 0, cw, ch);
+      return { src: cv.toDataURL('image/jpeg', FOTO_QUALIDADE), w: cw, h: ch };
+    });
+  }
+  function adicionarFotos(lista) {
+    var arqs = Array.prototype.slice.call(lista || []);
+    if (!arqs.length) return;
+    aviso('Processando ' + arqs.length + (arqs.length > 1 ? ' fotos…' : ' foto…'), 2500);
+    arqs.reduce(function (p, f) {
+      return p.then(function () {
+        return comprimir(f).then(function (ft) { estado.fotos.push(ft); desenharFotos(); })
+          .catch(function () { aviso('Não foi possível ler uma das imagens.'); });
+      });
+    }, Promise.resolve()).then(function () { limparErro('fotos'); agendarSalvar(); });
+  }
+  function desenharFotos() {
+    var box = $('photos'); box.innerHTML = '';
+    estado.fotos.forEach(function (ft, i) {
+      var fg = document.createElement('figure');
+      var im = document.createElement('img'); im.src = ft.src; im.alt = 'Foto ' + (i + 1);
+      var cap = document.createElement('figcaption'); cap.textContent = 'Foto ' + (i + 1);
+      var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'rm'; rm.textContent = '×';
+      rm.setAttribute('aria-label', 'Remover foto ' + (i + 1));
+      rm.addEventListener('click', function () { estado.fotos.splice(i, 1); desenharFotos(); agendarSalvar(); });
+      fg.appendChild(im); fg.appendChild(cap); fg.appendChild(rm); box.appendChild(fg);
+    });
+    for (var k = estado.fotos.length; k < MIN_FOTOS; k++) {
+      var s = document.createElement('div'); s.className = 'slot need'; s.textContent = 'Foto ' + (k + 1) + ' obrigatória'; box.appendChild(s);
+    }
+    var n = estado.fotos.length, c = $('count');
+    c.textContent = n + (n === 1 ? ' foto' : ' fotos') + ' · mínimo ' + MIN_FOTOS;
+    c.className = 'count ' + (n >= MIN_FOTOS ? 'ok' : 'no');
+  }
+  $('btn-cam').addEventListener('click', function () { $('in-cam').click(); });
+  $('btn-gal').addEventListener('click', function () { $('in-gal').click(); });
+  ['in-cam', 'in-gal'].forEach(function (id) {
+    $(id).addEventListener('change', function (e) { adicionarFotos(e.target.files); e.target.value = ''; });
+  });
+
+  /* ---------- Validação ---------- */
+  function validar() {
+    daTela(); limparTodosErros();
+    var primeiro = null;
+    function falha(id, txt) { erro(id, txt); if (!primeiro) primeiro = id; }
+    if (!estado.nome.trim()) falha('f-nome', 'Informe o nome do colaborador.');
+    if (!estado.tipo) falha('f-tipo', 'Selecione o tipo de levantamento.');
+    if (!estado.data) falha('f-data', 'Informe a data.');
+    var la = num(estado.lat), lo = num(estado.lon);
+    if (isNaN(la) || la < -90 || la > 90) falha('f-lat', 'Latitude inválida.');
+    if (isNaN(lo) || lo < -180 || lo > 180) falha('f-lon', 'Longitude inválida.');
+    if (!estado.equip.trim()) falha('f-equip', 'Informe o equipamento.');
+    var h = num(estado.altAnt);
+    if (isNaN(h) || h < 0) falha('f-alt', 'Informe a altura da antena em cm.');
+    if (!estado.tipoAlt) falha('tipoalt', 'Escolha vertical ou inclinada.');
+    if (estado.fotos.length < MIN_FOTOS) falha('fotos', 'Anexe pelo menos ' + MIN_FOTOS + ' fotos.');
+    if (primeiro) {
+      var alvo = $(primeiro) || document.querySelector('.msg[data-for="' + primeiro + '"]');
+      if (alvo && alvo.scrollIntoView) alvo.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      if (alvo && alvo.focus && $(primeiro)) alvo.focus({ preventScroll: true });
+      aviso('Faltam dados para gerar o relatório.');
+      return false;
+    }
+    return true;
+  }
+
+  /* ---------- PDF ---------- */
+  function dataBR(iso) { var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function dataHoraBR(ts) {
+    var d = new Date(ts), p = function (n) { return String(n).padStart(2, '0'); };
+    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function slug(s) {
+    return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
+  }
+  function nomeArquivo() {
+    return 'Relatorio_' + slug(estado.tipo.split('(')[0]) + '_' + slug(estado.nome) + '_' + estado.data + '.pdf';
+  }
+  function montarPDF() {
+    var J = window.jspdf && window.jspdf.jsPDF;
+    if (!J) throw new Error('Biblioteca de PDF não carregada.');
+    var doc = new J({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    var W = 210, H = 297, M = 14, CW = W - 2 * M, RODAPE = 16;
+    var NAVY = [11, 37, 69], TEAL = [11, 127, 120], CINZA = [86, 104, 130], LINHA = [204, 215, 227], PAINEL = [240, 245, 250];
+
+    /* cabeçalho */
+    doc.setFillColor.apply(doc, NAVY); doc.rect(0, 0, W, 27, 'F');
+    doc.setFillColor(19, 168, 158); doc.rect(0, 27, W, 1.2, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+    doc.text('Relatório de Coleta de Dados', M, 13);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(159, 224, 219);
+    doc.text('METRO CÚBICO ENGENHARIA  ·  LEVANTAMENTO TOPOGRÁFICO', M, 20);
+    doc.setTextColor(159, 224, 219); doc.setFontSize(7.5); doc.text('DATA', W - M, 10.5, { align: 'right' });
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.text(dataBR(estado.data), W - M, 18, { align: 'right' });
+
+    var y = 37;
+    function rotulo(txt, x, yy) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor.apply(doc, CINZA);
+      doc.text(txt.toUpperCase(), x, yy);
+    }
+    function campo(x, yy, w, rot, valor) {
+      rotulo(rot, x, yy);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor.apply(doc, NAVY);
+      var linhas = doc.splitTextToSize(String(valor), w - 3);
+      doc.text(linhas, x, yy + 5.2);
+      return 5.2 + linhas.length * 4.6;
+    }
+    var colW = CW / 2, h1 = Math.max(campo(M, y, colW, 'Colaborador', estado.nome.trim()), campo(M + colW, y, colW, 'Tipo de levantamento', estado.tipo));
+    y += h1 + 4;
+    var c3 = CW / 3, h2 = Math.max(
+      campo(M, y, c3 * 1.2, 'Equipamento', estado.equip.trim()),
+      campo(M + c3 * 1.2, y, c3 * 0.9, 'Altura da antena', fmt(num(estado.altAnt), 1) + ' cm'),
+      campo(M + c3 * 2.1, y, c3 * 0.9, 'Tipo de altura', estado.tipoAlt));
+    y += h2 + 3;
+    doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 6;
+
+    /* coordenadas */
+    var c = coordsValidas(), u = utm(c.lat, c.lon);
+    var pH = 31;
+    doc.setFillColor.apply(doc, PAINEL); doc.roundedRect(M, y, CW, pH, 1.5, 1.5, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, TEAL);
+    doc.text('COORDENADAS', M + 4, y + 5.5);
+    var q = (CW - 8) / 4, yy = y + 11;
+    campo(M + 4, yy, q, 'Latitude', c.lat.toFixed(7) + '°');
+    campo(M + 4 + q, yy, q, 'Longitude', c.lon.toFixed(7) + '°');
+    campo(M + 4 + 2 * q, yy, q, 'Precisão horizontal', estado.gpsFonte === 'gps' && estado.acc != null ? '±' + fmt(estado.acc, 1) + ' m' : 'não informada');
+    campo(M + 4 + 3 * q, yy, q, 'Altitude', estado.gpsFonte === 'gps' && estado.alt != null ? fmt(estado.alt, 1) + ' m' : 'não informada');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor.apply(doc, NAVY);
+    doc.text('UTM WGS 84, zona ' + u.zona + ' ' + u.hemi + ':   E ' + fmt(u.e, 2) + ' m    N ' + fmt(u.n, 2) + ' m', M + 4, y + 25);
+    doc.setFontSize(7.5); doc.setTextColor.apply(doc, CINZA);
+    var origem = estado.gpsFonte === 'gps' && estado.gpsHora ? 'Capturadas pelo GPS do aparelho em ' + dataHoraBR(estado.gpsHora) : estado.gpsFonte === 'manual' ? 'Coordenadas digitadas manualmente' : 'Coordenadas registradas no aparelho';
+    doc.text(origem, M + 4, y + 29.2);
+    y += pH + 7;
+
+    /* observações */
+    rotulo('Observações', M, y); y += 4.5;
+    var obs = estado.obs.trim() || 'Sem observações.';
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor.apply(doc, NAVY);
+    var linhas = doc.splitTextToSize(obs, CW);
+    linhas.forEach(function (ln) {
+      if (y > H - RODAPE - 6) { doc.addPage(); y = M + 4; }
+      doc.text(ln, M, y); y += 4.8;
+    });
+    y += 5;
+
+    /* fotos */
+    var gap = 6, cw = (CW - gap) / 2, ch = cw * 0.75, col = 0;
+    function cabFotos() { rotulo('Registro fotográfico (' + estado.fotos.length + ')', M, y); y += 4.5; }
+    if (y + ch + 6 > H - RODAPE) { doc.addPage(); y = M + 4; }
+    cabFotos();
+    estado.fotos.forEach(function (ft, i) {
+      if (col === 0 && y + ch > H - RODAPE) { doc.addPage(); y = M + 4; }
+      var x = M + col * (cw + gap);
+      doc.setFillColor.apply(doc, PAINEL); doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.3);
+      doc.rect(x, y, cw, ch, 'FD');
+      var esc = Math.min(cw / ft.w, ch / ft.h), iw = ft.w * esc, ih = ft.h * esc;
+      doc.addImage(ft.src, 'JPEG', x + (cw - iw) / 2, y + (ch - ih) / 2, iw, ih);
+      doc.setFillColor.apply(doc, NAVY); doc.roundedRect(x + 2, y + ch - 7, 16, 5, 1.2, 1.2, 'F');
+      doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+      doc.text('Foto ' + (i + 1), x + 4, y + ch - 3.4);
+      col++;
+      if (col === 2) { col = 0; y += ch + gap; }
+    });
+
+    /* rodapé */
+    var total = doc.getNumberOfPages(), agora = dataHoraBR(Date.now());
+    for (var p = 1; p <= total; p++) {
+      doc.setPage(p);
+      doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.3); doc.line(M, H - 12, W - M, H - 12);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, CINZA);
+      doc.text('Relatório de campo · ' + estado.nome.trim() + ' · gerado em ' + agora, M, H - 7.5);
+      doc.text('Página ' + p + ' de ' + total, W - M, H - 7.5, { align: 'right' });
+    }
+    return doc;
+  }
+  function gerar() {
+    if (!validar()) return null;
+    try {
+      var doc = montarPDF();
+      return new File([doc.output('blob')], nomeArquivo(), { type: 'application/pdf' });
+    } catch (e) { aviso('Erro ao gerar o PDF: ' + e.message, 7000); return null; }
+  }
+  function baixar(file) {
+    var url = URL.createObjectURL(file), a = document.createElement('a');
+    a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+  }
+  $('btn-pdf').addEventListener('click', function () {
+    var f = gerar(); if (!f) return; baixar(f); aviso('PDF salvo em Downloads: ' + f.name, 6000);
+  });
+  $('btn-share').addEventListener('click', function () {
+    var f = gerar(); if (!f) return;
+    var texto = 'Relatório de campo · ' + estado.nome.trim() + ' · ' + dataBR(estado.data);
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      navigator.share({ files: [f], title: texto, text: texto }).catch(function (e) {
+        if (e && e.name !== 'AbortError') { baixar(f); aviso('Não foi possível abrir o compartilhamento. PDF salvo em Downloads.', 6000); }
+      });
+    } else {
+      baixar(f); aviso('Este navegador não compartilha arquivos. PDF salvo em Downloads: anexe no WhatsApp ou e-mail.', 7000);
+    }
+  });
+
+  /* ---------- Novo relatório (confirmação em dois toques) ---------- */
+  var armado = false, tArma = null;
+  $('btn-new').addEventListener('click', function () {
+    var b = $('btn-new');
+    if (!armado) {
+      armado = true; b.textContent = 'Toque de novo para apagar tudo';
+      tArma = setTimeout(function () { armado = false; b.textContent = 'Novo relatório'; }, 4000);
+      return;
+    }
+    clearTimeout(tArma); armado = false; b.textContent = 'Novo relatório';
+    pararGPS(); daTela();
+    estado = vazio({ nome: estado.nome, tipo: estado.tipo, equip: estado.equip });
+    limparTodosErros(); paraTela(); agendarSalvar(); window.scrollTo({ top: 0, behavior: 'smooth' });
+    aviso('Novo relatório iniciado.');
+  });
+
+  /* ---------- Rede, instalação e service worker ---------- */
+  function rede() {
+    var n = $('net'), on = navigator.onLine;
+    n.textContent = on ? 'Online' : 'Offline'; n.className = 'chip' + (on ? '' : ' off');
+  }
+  window.addEventListener('online', rede); window.addEventListener('offline', rede); rede();
+  var evInstalar = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); evInstalar = e; $('btn-install').hidden = false; });
+  $('btn-install').addEventListener('click', function () {
+    if (!evInstalar) return;
+    evInstalar.prompt(); evInstalar.userChoice.then(function () { evInstalar = null; $('btn-install').hidden = true; });
+  });
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+
+  /* ---------- Início ---------- */
+  abrirDB().then(function () { return dbGet('rascunho'); }).then(function (r) {
+    if (r && typeof r === 'object') {
+      estado = Object.assign(vazio(), r);
+      if (!estado.data) estado.data = hojeISO();
+    }
+    montarDatalist(); paraTela();
+  });
+})();
+</script>
+</body>
+</html>

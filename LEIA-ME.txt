@@ -1,0 +1,39 @@
+RELATÓRIO DE CAMPO M3E - app de coleta de dados de topografia (PWA)
+
+O QUE FAZ
+- Formulário: colaborador, tipo de levantamento, data, coordenadas (GPS do aparelho),
+  equipamento, altura da antena (cm), tipo de altura (vertical/inclinada),
+  observações e fotos (mínimo 2).
+- Funciona sem internet depois da primeira abertura.
+- Gera PDF de uma página (fotos extras vão para a página seguinte) e compartilha
+  pelo WhatsApp, e-mail ou qualquer app do aparelho.
+- O rascunho fica salvo no aparelho até você tocar em "Novo relatório".
+
+ARQUIVOS (manter todos juntos na mesma pasta)
+  index.html, jspdf.umd.min.js, manifest.webmanifest, sw.js,
+  icon-192.png, icon-512.png, icon-maskable-512.png
+
+IMPORTANTE: GPS, modo offline e instalação só funcionam com HTTPS.
+Abrir o index.html direto do celular (file://) não serve.
+
+CAMINHO 1 - Hospedar e instalar pelo Chrome (mais rápido)
+1. Suba a pasta em um endereço HTTPS. Opção gratuita: GitHub Pages
+   (novo repositório > enviar os arquivos > Settings > Pages > branch main).
+   Também serve o servidor da M3E, desde que com HTTPS.
+2. No Android, abra o endereço no Chrome.
+3. Menu (três pontinhos) > "Instalar app" / "Adicionar à tela inicial".
+4. Abra uma vez com internet e permita a localização. Depois disso funciona offline.
+
+CAMINHO 2 - Gerar o APK (um arquivo para enviar pelo WhatsApp)
+1. Faça o passo 1 do caminho acima (precisa do endereço HTTPS).
+2. Acesse pwabuilder.com, cole o endereço e clique em Start.
+3. Escolha Package for stores > Android e gere o pacote.
+4. Do ZIP baixado, use o arquivo .apk (o .aab é só para a Play Store).
+5. Envie o .apk à equipe. No celular, o Android pede para permitir instalação
+   de fontes desconhecidas.
+Observação: para publicar na Play Store é preciso guardar o arquivo de chave
+(signing key) que o PWABuilder entrega junto.
+
+ATUALIZAR O APP
+Altere os arquivos, aumente a versão em sw.js (const VERSAO = 'm3e-relatorio-v2')
+e publique de novo. Os aparelhos recebem a nova versão ao abrir com internet.
